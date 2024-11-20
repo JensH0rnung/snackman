@@ -8,6 +8,7 @@ import * as THREE from "three"
 import { TransformControls } from 'three/addons/controls/TransformControls.js'
 import { Client } from '@stomp/stompjs';
 import type {IFrontendNachrichtEvent} from "@/services/IFrontendNachrichtEvent";
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 
 const wsurl = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/cube'
@@ -28,7 +29,6 @@ stompclient.onConnect = (frame) => {
   });
 };
 stompclient.activate()
-
 
 const canvasRef = ref()
 let renderer: THREE.WebGLRenderer;
@@ -51,7 +51,25 @@ const boxMaterial = new THREE.MeshMatcapMaterial({ color: "blue" })
 const box = new THREE.Mesh(boxGeometry, boxMaterial)
 box.castShadow = true
 box.receiveShadow = true
-scene.add(box)
+//scene.add(box)
+
+console.log('---------------------')
+const loader = new OBJLoader();
+        loader.load(
+            'low-poly-mill.obj',
+            function (object) {
+                scene.add(object);
+                object.position.set(0, 0, 0);
+                console.log('Objekt geladen:', object);
+            },
+            function (xhr) {
+                console.log((xhr.loaded / xhr.total * 100) + '% geladen');
+            },
+            function (error) {
+                console.error('Fehler beim Laden der OBJ-Datei:', error);
+            }
+        );
+
 
 
 document.addEventListener("keypress", (e) => {
