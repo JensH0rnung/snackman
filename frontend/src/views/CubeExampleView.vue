@@ -8,7 +8,8 @@ import * as THREE from "three"
 import { TransformControls } from 'three/addons/controls/TransformControls.js'
 import { Client } from '@stomp/stompjs';
 import type {IFrontendNachrichtEvent} from "@/services/IFrontendNachrichtEvent";
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 const wsurl = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/cube'
@@ -54,23 +55,41 @@ box.receiveShadow = true
 //scene.add(box)
 
 console.log('---------------------')
+
 const loader = new OBJLoader();
-        loader.load(
-            'models/low-poly-mill.obj',
-            function (object) {
-                scene.add(object);
-                object.position.set(0, 0, 0);
-                console.log('Objekt geladen:', object);
-            },
-            function (xhr) {
-                console.log((xhr.loaded / xhr.total * 100) + '% geladen');
-            },
-            function (error) {
-                console.error('Fehler beim Laden der OBJ-Datei:', error);
-            }
-        );
+loader.load(
+    'models/low-poly-mill.obj',
+    function (object) {
+      scene.add(object);
+      object.position.set(0, 0, 0);          
+      console.log('Objekt geladen:', object);
+    },
+    function (xhr) {
+      console.log((xhr.loaded / xhr.total * 100) + '% geladen');
+    },
+    function (error) {
+      console.error('Fehler beim Laden der OBJ-Datei:', error);
+    }
+);
 
+/*
+const loader = new GLTFLoader()
 
+loader.load(
+    '/models/strawberry_3d_model.glb',
+    (gltf) => {
+      const model = gltf.scene;
+      model.position.set(0, 0, 0);
+      model.scale.set(1, 1, 1);
+      scene.add(model);
+      console.log('GLTF model loaded:', model);
+    },
+    undefined,
+    (error) => {
+      console.error('Error loading GLTF model:', error);
+    }
+)
+*/ 
 
 document.addEventListener("keypress", (e) => {
   const angle = 0.1
