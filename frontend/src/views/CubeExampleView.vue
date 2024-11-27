@@ -56,7 +56,7 @@ box.receiveShadow = true
 console.log('---------------------')
 const loader = new OBJLoader();
         loader.load(
-            'low-poly-mill.obj',
+            'models/low-poly-mill.obj',
             function (object) {
                 scene.add(object);
                 object.position.set(0, 0, 0);
