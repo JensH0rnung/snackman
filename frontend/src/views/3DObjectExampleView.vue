@@ -1,8 +1,8 @@
 <template>
     <canvas ref="canvasRef"></canvas>
-  </template>
+</template>
   
-  <script setup lang="ts">
+<script setup lang="ts">
   import { onMounted, ref } from 'vue'
   import * as THREE from "three"
   import { TransformControls } from 'three/addons/controls/TransformControls.js'
@@ -25,6 +25,7 @@
   light.castShadow = true
   scene.add(light)
   
+  /*
   const objLoader = new OBJLoader()
   const mtlLoader = new MTLLoader()
   mtlLoader.load(
@@ -55,29 +56,58 @@
         }
   )
 
-/*
-  const glbLoader = new GLTFLoader()
-  
-  glbLoader.load(
-      '/models/strawberry_3d_model.glb',
-      (gltf) => {
-        const model = gltf.scene
-        model.position.set(0, 0, 0)
-        model.scale.set(0.1, 0.1, 0.1)
-        scene.add(model)
-        console.log('GLTF model loaded:', model)
-      },
-      undefined,
-      (error) => {
-        console.error('Error loading GLTF model:', error)
-      }
-  )
-*/
- 
   function animate() {
     requestAnimationFrame(animate)
     renderer.render(scene, camera)
  }
+*/
+  let mixer: THREE.AnimationMixer
+  const glbLoader = new GLTFLoader()
+  
+  glbLoader.load(
+    '/models/sculptober_day_21_fresh.glb',
+    (gltf) => {
+        const model = gltf.scene
+        model.position.set(0, 0, 0)
+        model.scale.set(10, 10, 10)
+
+        scene.add(model)
+
+        mixer = new THREE.AnimationMixer(model)
+
+        gltf.animations.forEach((clip) => {
+            const action = mixer.clipAction(clip)
+            action.play()
+        })
+        console.log('GLTF model loaded:', model)
+    },
+    (xhr) => {
+        console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+    },
+    (error) => {
+        console.error('Error loading GLB model:', error)
+    }
+  )
+
+  
+  function animate(delta: number) {
+    if (mixer) {
+        mixer.update(delta) // Update Mixer pro Frame
+    }
+    renderer.render(scene, camera)
+    }
+
+    // Call animate with delta time:
+    let clock = new THREE.Clock()
+    function renderLoop() {
+        requestAnimationFrame(renderLoop)
+        const delta = clock.getDelta() // Time between 2 Frame
+        animate(delta)
+        renderer.render(scene, camera)
+    }
+    
+ 
+  
   
   onMounted(() => {
     renderer = new THREE.WebGLRenderer({
@@ -92,7 +122,9 @@
 
     controls = new TransformControls(camera, renderer.domElement)
 
-    animate()
+    //animate()
+    renderLoop()
+
     renderer.render(scene, camera)
     window.addEventListener("resize", resizeCallback)
   })
@@ -103,5 +135,5 @@
     camera.updateProjectionMatrix()
   }
 
-  </script>
+</script>
   
