@@ -25,15 +25,6 @@
   light.castShadow = true
   scene.add(light)
   
-  /*
-  const boxGeometry = new THREE.BoxGeometry(1, 1, 1)
-  const boxMaterial = new THREE.MeshMatcapMaterial({ color: "blue" })
-  const box = new THREE.Mesh(boxGeometry, boxMaterial)
-  box.castShadow = true
-  box.receiveShadow = true
-  scene.add(box)
-  */
-
   const objLoader = new OBJLoader()
   const mtlLoader = new MTLLoader()
   mtlLoader.load(
@@ -63,21 +54,16 @@
             console.error('Fehler beim Laden MTL-Datei:', error)
         }
   )
-  
-  function animate() {
-    requestAnimationFrame(animate)
-    renderer.render(scene, camera)
- }
 
-  /*
-  const loader = new GLTFLoader()
+/*
+  const glbLoader = new GLTFLoader()
   
-  loader.load(
+  glbLoader.load(
       '/models/strawberry_3d_model.glb',
       (gltf) => {
         const model = gltf.scene
         model.position.set(0, 0, 0)
-        model.scale.set(1, 1, 1)
+        model.scale.set(0.1, 0.1, 0.1)
         scene.add(model)
         console.log('GLTF model loaded:', model)
       },
@@ -86,50 +72,13 @@
         console.error('Error loading GLTF model:', error)
       }
   )
-  */ 
-  
-  /*
-  document.addEventListener("keypress", (e) => {
-    const angle = 0.1
-    if (e.code === "KeyD") {
-      box.rotation.y += angle
-    }
-    if (e.code === "KeyW") {
-      box.rotation.x -= angle
-    }
-    if (e.code === "KeyA") {
-      box.rotation.y -= angle
-    }
-    if (e.code === "KeyS") {
-      box.rotation.x += angle
-    }
-    try {
-      const cubeData = {
-        width: box.geometry.parameters.width,
-        height: box.geometry.parameters.height,
-        depth: box.geometry.parameters.depth,
-        rotationAngleX: box.rotation.x,
-        rotationAngleY: box.rotation.y
-      };
-  
-      //Sende and /topic/cube/update
-      stompclient.publish({
-        destination: DEST+"/update", headers: {},
-        body: JSON.stringify(cubeData)
-      });
-    } catch (fehler) {
-      console.log(fehler)
-    }
+*/
+ 
+  function animate() {
+    requestAnimationFrame(animate)
     renderer.render(scene, camera)
-  })
+ }
   
-  function updateBox(event : IFrontendNachrichtEvent){
-    box.rotation.x = event.cubeDTO.rotationAngleX
-    box.rotation.y = event.cubeDTO.rotationAngleY
-    renderer.render(scene, camera)
-  }
-  */
-
   onMounted(() => {
     renderer = new THREE.WebGLRenderer({
       canvas: canvasRef.value,
