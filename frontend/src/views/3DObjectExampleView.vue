@@ -25,7 +25,7 @@
   light.castShadow = true
   scene.add(light)
   
-  /*
+  
   const objLoader = new OBJLoader()
   const mtlLoader = new MTLLoader()
   mtlLoader.load(
@@ -56,11 +56,11 @@
         }
   )
 
-  function animate() {
-    requestAnimationFrame(animate)
+  function objAnimate() {
+    requestAnimationFrame(objAnimate)
     renderer.render(scene, camera)
  }
-*/
+
   let mixer: THREE.AnimationMixer
   const glbLoader = new GLTFLoader()
   
@@ -68,7 +68,7 @@
     '/models/sculptober_day_21_fresh.glb',
     (gltf) => {
         const model = gltf.scene
-        model.position.set(0, 0, 0)
+        model.position.set(10, 0, 10)
         model.scale.set(10, 10, 10)
 
         scene.add(model)
@@ -90,7 +90,7 @@
   )
 
   
-  function animate(delta: number) {
+  function glbAnimate(delta: number) {
     if (mixer) {
         mixer.update(delta) // Update Mixer pro Frame
     }
@@ -102,8 +102,7 @@
     function renderLoop() {
         requestAnimationFrame(renderLoop)
         const delta = clock.getDelta() // Time between 2 Frame
-        animate(delta)
-        renderer.render(scene, camera)
+        glbAnimate(delta)
     }
     
  
@@ -122,7 +121,7 @@
 
     controls = new TransformControls(camera, renderer.domElement)
 
-    //animate()
+    objAnimate()
     renderLoop()
 
     renderer.render(scene, camera)
