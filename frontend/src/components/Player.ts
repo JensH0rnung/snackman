@@ -4,6 +4,7 @@ import { PointerLockControls } from 'three/addons/controls/PointerLockControls.j
 
 export class Player {
     private prevTime: DOMHighResTimeStamp
+    private readonly SPRINT_FACTOR: number = 3.0;
     private DECELERATION: number;
     private ACCELERATION: number;
 
@@ -13,6 +14,7 @@ export class Player {
     private moveLeft: boolean;
     private moveRight: boolean;
     private canJump: boolean;
+    private isSprinting: boolean;
 
     private camera: THREE.PerspectiveCamera;
     private controls: PointerLockControls;
@@ -30,6 +32,7 @@ export class Player {
         this.moveLeft = false;
         this.moveRight = false;
         this.canJump = true;
+        this.isSprinting = false;
 
         this.velocity = new THREE.Vector3();
         this.movementDirection = new THREE.Vector3();
@@ -79,6 +82,10 @@ export class Player {
           case 'KeyD':
             this.moveRight = false
             break
+
+          case 'ShiftLeft':
+            this.isSprinting = false
+            break
         }
       }
 
@@ -103,6 +110,10 @@ export class Player {
           case 'KeyD':
             this.moveRight = true
             break
+
+          case 'ShiftLeft':
+            this.isSprinting = true
+            break
         }
       }
 
@@ -120,6 +131,7 @@ export class Player {
     public updatePlayer() {
         const time = performance.now()
         const delta = (time - this.prevTime) / 1000
+        const currentAcceleration = this.isSprinting ? this.ACCELERATION * this.SPRINT_FACTOR : this.ACCELERATION;
 
         this.velocity.x -= this.velocity.x * this.DECELERATION * delta
         this.velocity.z -= this.velocity.z * this.DECELERATION * delta
@@ -127,9 +139,9 @@ export class Player {
         this.movementDirection.x = Number(this.moveRight) - Number(this.moveLeft)
         this.movementDirection.normalize()
         if (this.moveForward || this.moveBackward)
-            this.velocity.z -= this.movementDirection.z * this.ACCELERATION * delta
+          this.velocity.z -= this.movementDirection.z * currentAcceleration * delta
         if (this.moveLeft || this.moveRight)
-            this.velocity.x -= this.movementDirection.x * this.ACCELERATION * delta
+            this.velocity.x -= this.movementDirection.x * currentAcceleration * delta
         this.controls.moveRight(-this.velocity.x * delta)
         this.controls.moveForward(-this.velocity.z * delta)
         this.prevTime = time

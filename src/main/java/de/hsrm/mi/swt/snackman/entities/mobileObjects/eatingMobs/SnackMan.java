@@ -9,6 +9,8 @@ public class SnackMan extends EatingMob {
     private double posZ;
     private double dirY;
     private double radius;
+    private double speed;
+    private final double baseSpeed = 1.0;
 
     public SnackMan(double x, double z){
         super();
@@ -18,6 +20,7 @@ public class SnackMan extends EatingMob {
         posZ = z;
         dirY = 0;
         radius = GameConfig.SNACKMAN_RADIUS;
+        this.speed = baseSpeed;
     }
 
     public double getPosX() {
@@ -56,12 +59,24 @@ public class SnackMan extends EatingMob {
         this.radius = radius;
     }
 
+    public double getSpeed() {
+        return speed;
+    }
+    
+    public void setSpeed(double speed) {
+        this.speed = speed;
+    }
+
+    public double getBaseSpeed() {
+        return baseSpeed;
+    }
+
     @Override
     public void move(double x, double y, double z) {
         if(x-radius > -4){
-            posX = x;
+            posX = x * speed;
         }
-        posZ = z;
+        posZ = z * speed;
         calcMapIndex(posX, posZ);
     }
 

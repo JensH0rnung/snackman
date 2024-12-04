@@ -12,18 +12,24 @@ import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackManDTO;
 public class PlayerMovementController {
 
   @Autowired
-    private SimpMessagingTemplate messagingTemplate;
-    
-    private final SnackMan snackman = new SnackMan(0, 0);
+  private SimpMessagingTemplate messagingTemplate;
 
-    // Erhalte Messages von /topic/player/update
-    @MessageMapping("/topic/player/update")
-    public void spreadPlayerUpdate(SnackManDTO player) {
-      //Validation here
-      
-      snackman.move(player.posX(), player.posY(), player.posZ());
-      snackman.setDirY(player.dirY());
-      messagingTemplate.convertAndSend("/topic/player", SnackManDTO.toSnackManDTO(snackman));
+  private final SnackMan snackman = new SnackMan(0, 0);
+  private final double SPRINT_FACTOR = 3.0;
+
+  // Erhalte Messages von /topic/player/update
+  @MessageMapping("/topic/player/update")
+  public void spreadPlayerUpdate(SnackManDTO player) {
+    // Validation here
+
+    snackman.move(player.posX(), player.posY(), player.posZ());
+    snackman.setDirY(player.dirY());
+    if (player.isSprinting()) {
+      snackman.setSpeed(snackman.getSpeed() * SPRINT_FACTOR);
+    } else {
+      snackman.setSpeed(snackman.getBaseSpeed());
     }
+    messagingTemplate.convertAndSend("/topic/player", SnackManDTO.toSnackManDTO(snackman));
+  }
 
 }
