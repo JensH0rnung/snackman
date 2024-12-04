@@ -10,33 +10,64 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.python.util.PythonInterpreter;
+
 /**
  * Service class for managing the game map
  * This class is responsible for loading and providing access to the game map data
  */
 @Service
 public class MapService {
-
     private String filePath;
     private GameMap gameMap;
-
     Logger log = LoggerFactory.getLogger(MapService.class);
 
     /**
      * Constructs a new MapService
      * Initializes the maze data by reading from a file and creates a Map object
      */
-    @Autowired
-    public MapService(ReadMazeService readMazeService) {
-        this(readMazeService, "mini-maze.txt");
+    public MapService() {
+
+        generateNewMaze();
+
+        this.filePath = "Maze.txt";
+        char[][] mazeData = readMazeFromFile(this.filePath);
+        gameMap = switchMazeDataIntoMapObjectsInMaze(mazeData);
     }
 
-    public MapService(ReadMazeService readMazeService, String filePath) {
-        this.filePath = filePath;
-        char[][] mazeData = readMazeService.readMazeFromFile(this.filePath);
-        gameMap = convertMazeDataGameMap(mazeData);
-    }
+    /**
+     * Reads maze data from a file and converts it into a char array with [x][z]-coordinates
+     *
+     * @param filePath the path to the file containing the maze data
+     * @return a char array representing the maze
+     * @throws RuntimeException if there's an error reading the file
+     */
+    protected char[][] readMazeFromFile(String filePath) {
+        List<String> lines = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Fehler beim Lesen der Maze-Datei", e);
+        }
 
+        int rows = lines.size();
+        int cols = lines.getFirst().length();
+        char[][] mazeAsCharArray = new char[rows][cols];
+
+        for (int i = 0; i < rows; i++) {
+            mazeAsCharArray[i] = lines.get(i).toCharArray();
+        }
+        return mazeAsCharArray;
+    }
 
     /**
      * Converts the char array maze data into MapObjects and populates the game map
@@ -61,6 +92,15 @@ public class MapService {
         }
 
         return new GameMap(squaresBuildingMap);
+    }
+
+    public void generateNewMaze(){
+        String path = System.getProperty("user.dir") + "/src/main/java/de/hsrm/mi/swt/snackman/Maze.py";
+
+        //generates a new randome Maze
+        try(PythonInterpreter interpreter = new PythonInterpreter()){
+            interpreter.execfile(path);
+        }
     }
 
     /**
