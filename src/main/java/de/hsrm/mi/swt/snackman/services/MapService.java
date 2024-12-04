@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.python.util.PythonInterpreter;
+
 /**
  * Service class for managing the game map
  * This class is responsible for loading and providing access to the maze data
@@ -31,7 +33,10 @@ public class MapService {
      * Initializes the maze data by reading from a file and creates a Map object
      */
     public MapService() {
-        this.filePath = "mini-maze.txt";
+        
+        generateNewMaze();
+
+        this.filePath = "Maze.txt";
         char[][] mazeData = readMazeFromFile(this.filePath);
         gameMap = switchMazeDataIntoMapObjectsInMaze(mazeData);
     }
@@ -91,6 +96,15 @@ public class MapService {
         }
 
         return new GameMap(squaresBuildingMap);
+    }
+
+    public void generateNewMaze(){
+        String path = System.getProperty("user.dir") + "/src/main/java/de/hsrm/mi/swt/snackman/Maze.py";
+
+        //generates a new randome Maze
+        try(PythonInterpreter interpreter = new PythonInterpreter()){
+            interpreter.execfile(path);
+        }
     }
 
     //TODO add Javadoc
