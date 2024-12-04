@@ -38,7 +38,7 @@ public class MapService {
     private String filePath;
     private GameMap gameMap;
 
-    Logger log = LoggerFactory.getLogger(MapService.class);
+    //Logger log = LoggerFactory.getLogger(MapService.class);
 
     /**
      * Constructs a new MapService
