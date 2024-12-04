@@ -1,4 +1,4 @@
-package de.hsrm.mi.swt.snackman.entities.mapObject;
+package de.hsrm.mi.swt.snackman.entities.MapObject;
 
 /**
  * abstract class for general MapObjects – are then divided into eatable and walls

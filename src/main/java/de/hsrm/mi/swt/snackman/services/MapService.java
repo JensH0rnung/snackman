@@ -1,8 +1,8 @@
 package de.hsrm.mi.swt.snackman.services;
 
-import de.hsrm.mi.swt.snackman.entities.mapObject.floor.Floor;
-import de.hsrm.mi.swt.snackman.entities.mapObject.MapObject;
-import de.hsrm.mi.swt.snackman.entities.mapObject.wall.Wall;
+import de.hsrm.mi.swt.snackman.entities.MapObject.MapObject;
+import de.hsrm.mi.swt.snackman.entities.MapObject.floor.Floor;
+import de.hsrm.mi.swt.snackman.entities.MapObject.wall.Wall;
 import de.hsrm.mi.swt.snackman.entities.square.Square;
 import org.springframework.stereotype.Service;
 
