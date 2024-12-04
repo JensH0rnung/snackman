@@ -25,7 +25,7 @@ public class SnackManController {
                 int newCalories = (int) event.getNewValue();
                 String message = newCalories == snackman.getMAXCALORIES() ? "Maximum calories reached!" : "";
                 SnackManUpdateDTO update = new SnackManUpdateDTO(newCalories, message);
-
+                System.out.println(message);
                 messagingTemplate.convertAndSend("/topic/update", update);
             }
 
