@@ -4,6 +4,7 @@ import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
@@ -11,10 +12,21 @@ import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.services.MapService;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+
 @Component
 public class SnackMan extends EatingMob {
 
+   /* @Autowired
+    private ApplicationEventPublisher eventPublisher;
+    */
+
+    private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
+
     private int currentCalories;
+    private final int MAXCALORIES = 3000;
+
     private double posX;
     private double posY;
     private double posZ;
@@ -23,6 +35,9 @@ public class SnackMan extends EatingMob {
     private Square currentSquare;
 
     private MapService mapService;
+
+
+
 
     @Autowired
     public SnackMan(MapService mapService){
@@ -214,6 +229,10 @@ public class SnackMan extends EatingMob {
         return currentCalories;
     }
 
+    public int getMAXCALORIES(){
+        return MAXCALORIES;
+    }
+
     /**
      * Collects the snack on the square if there is one.
      * If there is one that remove it from the square.
@@ -223,10 +242,28 @@ public class SnackMan extends EatingMob {
         Snack snackOnSquare = square.getSnack();
 
         if(snackOnSquare != null){
-            currentCalories += snackOnSquare.getCalories();
+            int oldCalories = this.currentCalories;
 
-            //set snack to null after consuming it
+            if ( (currentCalories + snackOnSquare.getCalories()) >= MAXCALORIES ){
+                currentCalories = MAXCALORIES;
+            }
+            else{
+            currentCalories += snackOnSquare.getCalories();
+            }
             square.setSnack(null);
+
+            propertyChangeSupport.firePropertyChange("currentCalories", oldCalories, currentCalories);
         }
+    }
+
+
+    // Listener hinzufügen
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.addPropertyChangeListener(listener);
+    }
+
+    // Listener entfernen
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        propertyChangeSupport.removePropertyChangeListener(listener);
     }
 }
