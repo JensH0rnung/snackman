@@ -1,7 +1,6 @@
 package de.hsrm.mi.swt.snackman.entities.square;
 
-import de.hsrm.mi.swt.snackman.entities.MapObject.MapObject;
-
+import de.hsrm.mi.swt.snackman.entities.mapObject.MapObject;
 import java.util.List;
 
 public class Square {
