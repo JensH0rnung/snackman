@@ -32,19 +32,4 @@ public class SnackManController {
         });
     }
 
-
-/*    @GetMapping("/snackman/calories")
-    public void getSnackManCalories(){
-        int calories = snackman.getCurrentCalories();
-        String massage = calories == snackman.getMAXCALORIES()? "Maximale Kalorien erreicht!" : "";
-        SnackManUpdateDTO update = new SnackManUpdateDTO(calories, massage);
-        messagingTemplate.convertAndSend("/topic/update", update);
-    }
-
- */
-
-
-
-
-
 }
