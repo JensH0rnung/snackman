@@ -129,3 +129,4 @@ def choose_random_square(original_liste):
      return replace_first_element(original_liste, "L")
 
 #print(choose_next_square(testingliste))
+#print(choose_next_square(["W", "L", "W", "L", "W", "L", "W", "L", "L"]))

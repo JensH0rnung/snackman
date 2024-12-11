@@ -20,7 +20,7 @@ public class ChickenMovementTest {
         Chicken chicken = new Chicken();
         chicken.initJython();
 
-        List<String> visibleEnvironment = List.of("W", "L", "W", "L", "W", "L", "W", "L", "0");
+        List<String> visibleEnvironment = List.of("W", "L", "W", "L", "W", "L", "W", "L", "L");
 
         List<String> result = chicken.executeMovementSkript(visibleEnvironment);
 

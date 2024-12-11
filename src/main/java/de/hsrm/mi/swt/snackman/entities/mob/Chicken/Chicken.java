@@ -119,7 +119,7 @@ public class Chicken extends EatingMob implements Runnable {
      * Initializes Jython for executing the chicken's movement script.
      * Sets up the required Python environment and interpreter.
      */
-    protected void initJython() {
+    public void initJython() {
         pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman/entities/mob/Chicken");
         PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
         this.pythonInterpreter = new PythonInterpreter();
@@ -159,7 +159,7 @@ public class Chicken extends EatingMob implements Runnable {
      * @param pyList the Python list to convert.
      * @return the corresponding Java list.
      */
-    private List<String> convertPythonList(PyList pyList) {
+    protected List<String> convertPythonList(PyList pyList) {
         List<String> javaList = new ArrayList<>();
         for (Object item : pyList) {
             javaList.add(item.toString());
