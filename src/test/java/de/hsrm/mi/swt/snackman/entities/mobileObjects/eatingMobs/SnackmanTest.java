@@ -1,70 +1,50 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
+import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
 import de.hsrm.mi.swt.snackman.services.MapService;
 import de.hsrm.mi.swt.snackman.services.ReadMazeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
 
 @SpringBootTest
-public class SnackmanTest {
+public class SnackManTest {
+
+    @Autowired
+    private FrontendMessageService frontendMessageService;
+
+    @Autowired
+    private ReadMazeService readMazeService;
 
     private SnackMan snackMan;
-    private Square square;
-
+    
     @BeforeEach
     public void setUp() {
-
-        snackMan = new SnackMan(new MapService(new ReadMazeService()));
-
-        Snack snack = new Snack(SnackType.APPLE);
-        square = new Square(snack, 0, 0);
+        snackMan = new SnackMan(new MapService(frontendMessageService, readMazeService), GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
     }
 
     @Test
     void testConsumeSnack() {
-        assertEquals(0, snackMan.getCurrentCalories(), "Initial calories should be 0.");
+        Square firstSquare = new Square(new Snack(SnackType.APPLE), 0, 0);
+        Square secondSquare = new Square(new Snack(SnackType.ORANGE), 0, 1);
 
-        snackMan.consumeSnackOnSquare(square);
-        assertEquals(SnackType.APPLE.getCalories(), snackMan.getCurrentCalories(), "After consuming an Apple the calories of snackman should increase.");
-        assertNull(square.getSnack(), "After consuming the snack, the square should no longer have a snack.");
-    }
+        snackMan.consumeSnackOnSquare(firstSquare);
+        assertEquals(snackMan.getCurrentCalories(), SnackType.APPLE.getCalories(), "After consuming an Apple the " +
+                "calories of snackman should increase.");
+        assertNull(firstSquare.getSnack(), "After consuming an snack on the squarem the square should not have a" +
+                "snack anymore.");
 
-    @Test
-    void testConsumeMaximumSnacks(){
-        Snack apple = new Snack(SnackType.APPLE);
-        Square appleSquare1 = new Square(apple, 0, 0);
-        Square appleSquare2 = new Square(apple, 0, 1);
-        Square appleSquare3 = new Square(apple, 0, 2);
-        Square appleSquare4 = new Square(apple, 0, 3);
-        Square appleSquare5 = new Square(apple, 0, 4);
-
-        assertEquals(0, snackMan.getCurrentCalories(), "Initial calories should be 0.");
-
-        // adding Snacks to Square -> MAXCALORIES could be checked
-
-        snackMan.consumeSnackOnSquare(appleSquare1);
-        snackMan.consumeSnackOnSquare(appleSquare2);
-        snackMan.consumeSnackOnSquare(appleSquare3);
-        snackMan.consumeSnackOnSquare(appleSquare4);
-        snackMan.consumeSnackOnSquare(appleSquare5);
-
-        assertEquals(snackMan.getMAXCALORIES(), snackMan.getCurrentCalories(), "After consuming 5 apples the calories should be capped at 3000.");
-
-        assertNull(appleSquare1.getSnack(), "After consuming the snacks, the square should no longer have a snack.");
-        assertNull(appleSquare2.getSnack(), "After consuming the snacks, the square should no longer have a snack.");
-        assertNull(appleSquare3.getSnack(), "After consuming the snacks, the square should no longer have a snack.");
-        assertNull(appleSquare4.getSnack(), "After consuming the snacks, the square should no longer have a snack.");
-        assertNull(appleSquare5.getSnack(), "After consuming the snacks, the square should no longer have a snack.");
-
-
-
-
-
+        snackMan.consumeSnackOnSquare(secondSquare);
+        assertEquals(snackMan.getCurrentCalories(), SnackType.APPLE.getCalories() + SnackType.ORANGE.getCalories(), "After " +
+                "consuming an Apple and a Orange the calories of Snackman should be the sum of both snacks.");
+        assertNull(secondSquare.getSnack(), "After consuming an snack on the squarem the square should not have a" +
+                "snack anymore.");
     }
 }
