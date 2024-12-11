@@ -2,6 +2,7 @@ package de.hsrm.mi.swt.snackman.services;
 
 import java.beans.PropertyChangeEvent;
 
+import de.hsrm.mi.swt.snackman.messaging.*;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,10 +16,6 @@ import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
-import de.hsrm.mi.swt.snackman.messaging.ChangeType;
-import de.hsrm.mi.swt.snackman.messaging.EventType;
-import de.hsrm.mi.swt.snackman.messaging.FrontendMessageEvent;
-import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
 
 /**
  * Service class for managing the game map
@@ -50,6 +47,18 @@ public class MapService {
         char[][] mazeData = readMazeService.readMazeFromFile(this.filePath);
         gameMap = convertMazeDataGameMap(mazeData);
         snackman = new SnackMan(this, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS);
+
+        snackman.addPropertyChangeListener(event -> {
+            if (event.getPropertyName().equals("currentCalories")) {
+                int newCalories = (int) event.getNewValue();
+                String message = newCalories == snackman.getMAXKCAL() ? "Maximum calories reached!" : "";
+                System.out.println("Listener initilized");
+
+                FrontendMessageCaloriesEvent messageEvent = new FrontendMessageCaloriesEvent(EventType.CALORIES, ChangeType.UPDATE, newCalories, message);
+
+                frontendMessageService.sendUpdateCaloriesEvent(messageEvent);
+            }
+        });
 
     }
 

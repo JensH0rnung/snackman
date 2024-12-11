@@ -24,4 +24,10 @@ public class FrontendMessageService {
 
         messagingTemplate.convertAndSend("/topic/square", ev);
     }
+
+    public void sendUpdateCaloriesEvent(FrontendMessageCaloriesEvent ev) {
+        log.info("Send Event: eventType {}, changeTyp {}", ev.eventType(), ev.changeType());
+
+        messagingTemplate.convertAndSend("/topic/calories", ev);
+    }
 }

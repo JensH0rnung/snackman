@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, onUnmounted, ref} from 'vue'
+import {computed, onMounted, onUnmounted, ref} from 'vue'
 import * as THREE from 'three'
 import { Client } from '@stomp/stompjs'
 import { Player } from '@/components/Player';
@@ -23,12 +23,13 @@ import { fetchSnackManFromBackend } from '@/services/SnackManInitService';
 import { GameMapRenderer } from '@/renderer/GameMapRenderer';
 import { useGameMapStore } from '@/stores/gameMapStore';
 import type { IGameMap } from '@/stores/IGameMapDTD';
+import type {IFrontendCaloriesMessageEvent} from "@/services/IFrontendMessageEvent";
 
 const WSURL = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/player'
 const targetHz = 30
 
-const UPDATE = '/topic/player/calories'
+const UPDATE = '/topic/calories'
 
 //Reaktive Calories Variable
 const MAXCALORIES = 3000;
@@ -62,11 +63,12 @@ stompclient.onConnect = frame => {
 
   // Calories Verarbeitung
   stompclient.subscribe(UPDATE, message => {
-    const event: IPlayerDTD = JSON.parse(message.body);
+    const event: IFrontendCaloriesMessageEvent = JSON.parse(message.body);
+
 
     // Get Calories
-    if (event.currentCalories !== undefined) {
-      currentCalories.value = event.currentCalories;
+    if (event.calories !== undefined) {
+      currentCalories.value = event.calories;
     }
     if ( event.message) {
       caloriesMessage.value = event.message;
