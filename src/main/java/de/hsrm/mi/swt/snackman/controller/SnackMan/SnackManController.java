@@ -26,7 +26,7 @@ public class SnackManController {
                 String message = newCalories == snackman.getMAXCALORIES() ? "Maximum calories reached!" : "";
                 SnackManUpdateDTO update = new SnackManUpdateDTO(newCalories, message);
 
-                messagingTemplate.convertAndSend("/topic/update", update);
+                messagingTemplate.convertAndSend("/topic/player/calories", update);
             }
 
         });

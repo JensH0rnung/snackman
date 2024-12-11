@@ -28,7 +28,7 @@ const ACCELERATION = 300.0
 const WSURL = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/player'
 
-const UPDATE = '/topic/update'
+const UPDATE = '/topic/player/calories'
 
 //Reaktive Calories Variable
 const MAXCALORIES = 3000;
