@@ -7,7 +7,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import de.hsrm.mi.swt.snackman.entities.mob.Chicken.Characters.TalaChickenBehavior;
-import de.hsrm.mi.swt.snackman.entities.mob.Chicken.Characters.TalaChicken.TalaChicken;
 
 public class ChickenTestKlasseTest {
     
