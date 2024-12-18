@@ -53,7 +53,7 @@ public abstract class EatingMob extends Mob {
 
     /**
      * Collects the snack on the square if there is one.
-     * If there is one that remove it from the square.
+     * If there is one than remove it from the square.
      *
      * @param square to eat the snack from
      */
