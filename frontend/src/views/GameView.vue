@@ -24,6 +24,7 @@ import { GameMapRenderer } from '@/renderer/GameMapRenderer';
 import { useGameMapStore } from '@/stores/gameMapStore';
 import type { IGameMap } from '@/stores/IGameMapDTD';
 import type {IFrontendCaloriesMessageEvent} from "@/services/IFrontendMessageEvent";
+import { GLTFLoader } from 'three/examples/jsm/Addons.js';
 
 const WSURL = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/player'
@@ -39,6 +40,10 @@ const caloriesMessage = ref('');
 
 
 
+
+const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb';
+let snackManModel: THREE.Group<THREE.Object3DEventMap>;
+// other textures
 
 // stomp
 const stompclient = new Client({brokerURL: WSURL})
@@ -108,7 +113,6 @@ let prevTime = performance.now();
 // camera setup
 let camera: THREE.PerspectiveCamera;
 
-
 // used to calculate fps in animate()
 const clock = new THREE.Clock();
 let fps: number;
@@ -117,7 +121,7 @@ let counter = 0;
 // is called every frame, changes camera position and velocity
 // only sends updates to backend at 30hz
 function animate() {
-  fps = 1 / clock.getDelta()
+  fps = 1 / clock.getDelta();
   player.updatePlayer();
   if (counter >= fps / targetHz) {
     // console.log(`${player.getCamera().position.x}  |  ${player.getCamera().position.z}`)
@@ -135,14 +139,33 @@ function animate() {
         }, {delta: delta}))
       });
     } catch (fehler) {
-      console.log(fehler)
+      console.log(fehler);
     }
     prevTime = time;
     counter = 0
   }
   counter++;
-  renderer.render(scene, camera)
+
+  renderer.render(scene, camera);
 }
+
+// initially loads the playerModel & attaches playerModel to playerCamera
+function loadPlayerModel(texture: string) {
+      const loader = new GLTFLoader();
+      loader.load(
+        texture,
+        (gltf) => {
+            snackManModel = gltf.scene;
+
+            snackManModel.scale.set(1, 1, 1);
+            // rotation in radians (Bogenmaß), 180° doesnt work as intended
+            snackManModel.rotation.y = Math.PI;
+            // optional offset for thirdPersonView
+            // snackManModel.position.set(0, -1.55, -5);
+            player.getCamera().add(snackManModel);
+        }
+      )
+    }
 
 onMounted(async () =>{
 // for rendering the scene, create gameMap in 3d and change window size
@@ -167,6 +190,8 @@ onMounted(async () =>{
   player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius, playerData.speed)
   camera = player.getCamera()
   scene.add(player.getControls().object)
+
+  loadPlayerModel(SNACKMAN_TEXTURE);
 
   renderer.render(scene, camera)
   renderer.setAnimationLoop(animate)
