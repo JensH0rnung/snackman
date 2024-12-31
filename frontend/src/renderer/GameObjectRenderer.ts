@@ -74,11 +74,10 @@ export const GameObjectRenderer = () => {
     const audioLoader = new THREE.AudioLoader()
     audioLoader.load('/src/assets/sounds/chicken_noises.ogg', buffer => {
       sound.setBuffer(buffer)
-      sound.setRefDistance(3) // maximum volume at x units of distance
-      sound.setMaxDistance(10)
+      sound.setRefDistance(5) // maximum volume at x units of distance
+      sound.setMaxDistance(12) // max distance
       sound.setRolloffFactor(1) // how quickly the volume decreases with increasing distance
       sound.setDistanceModel('linear') // decrease in volume (linear is a good choice for games)
-      sound.setDirectionalCone(180, 230, 0.1)
       sound.setLoop(true)
       sound.setVolume(0.5)
       sound.play()
