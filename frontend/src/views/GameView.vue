@@ -2,22 +2,21 @@
   <div class="Main">
     <canvas ref="canvasRef"></canvas>
     <div class="sprint-bar">
-      <div class="sprint-bar-inner" :style="sprintBarStyle"></div>
+      <div :style="sprintBarStyle" class="sprint-bar-inner"></div>
     </div>
 
-    <div class="Calories-Overlay" :style="getBackgroundStyle">
+    <div :style="getBackgroundStyle" class="Calories-Overlay">
       <div class="overlayContent">
-        <img src="@/assets/calories.svg" alt="calories" class="calories-icon"/>
-        <p v-if="currentCalories<MAXCALORIES">{{ currentCalories }}kcal</p>
+        <img alt="calories" class="calories-icon" src="@/assets/calories.svg" />
+        <p v-if="currentCalories < MAXCALORIES">{{ currentCalories }}kcal</p>
         <p v-else>{{ caloriesMessage }}</p>
       </div>
     </div>
   </div>
-
 </template>
 
-<script setup lang="ts">
-import {computed, onMounted, onUnmounted, reactive, ref} from 'vue'
+<script lang="ts" setup>
+import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
 import * as THREE from 'three'
 import {Client} from '@stomp/stompjs'
 import {Player} from '@/components/Player';
@@ -28,6 +27,7 @@ import {useGameMapStore} from '@/stores/gameMapStore';
 import type {IGameMap} from '@/stores/IGameMapDTD';
 import type {IFrontendCaloriesMessageEvent} from "@/services/IFrontendSnackMessageEvent";
 import {GLTFLoader} from 'three/examples/jsm/Addons.js';
+import { GameObjectRenderer } from '@/renderer/GameObjectRenderer'
 import {initSnackEatingSound} from "@/services/SoundManager";
 
 const WSURL = `ws://${window.location.host}/stompbroker`
@@ -48,7 +48,7 @@ let snackManModel: THREE.Group<THREE.Object3DEventMap>;
 // other textures
 
 // stomp
-const stompclient = new Client({brokerURL: WSURL})
+const stompclient = new Client({ brokerURL: WSURL })
 stompclient.onWebSocketError = event => {
   //console.log(event)
 }
@@ -63,26 +63,24 @@ stompclient.onConnect = frame => {
     // ggf. mit JSON.parse(message.body) zu JS konvertieren
     const event: IPlayerDTD = JSON.parse(message.body)
 
-    sprintData.sprintTimeLeft = (event.sprintTimeLeft / 5) * 100;
-    sprintData.isSprinting = event.isSprinting;
+    sprintData.sprintTimeLeft = (event.sprintTimeLeft / 5) * 100
+    sprintData.isSprinting = event.isSprinting
 
     // If the cooldown is active in the backend and the local state is not yet in cooldown
     if (event.isInCooldown && !sprintData.isCooldown) {
-      const usedSprintTime = 5 - event.sprintTimeLeft;
-      startCooldownFill(usedSprintTime);
+      const usedSprintTime = 5 - event.sprintTimeLeft
+      startCooldownFill(usedSprintTime)
     }
 
     // When the backend cooldown has ended, but the local state is still in cooldown
     if (!event.isInCooldown && sprintData.isCooldown) {
-      stopCooldownFill();
+      stopCooldownFill()
     }
 
-    sprintData.isCooldown = event.isInCooldown;
+    sprintData.isCooldown = event.isInCooldown
 
-    player.setPosition(event.posX, event.posY, event.posZ);
-
-
-  });
+    player.setPosition(event.posX, event.posY, event.posZ)
+  })
 
   // Calories Verarbeitung
   stompclient.subscribe(UPDATE, message => {
@@ -111,6 +109,7 @@ stompclient.onConnect = frame => {
   });
 }
 
+
 // Kalorien-Overlay Fill berrechnen
 const getBackgroundStyle = computed(() => {
   const maxCalories = 3000;
@@ -129,23 +128,23 @@ stompclient.activate()
 
 const canvasRef = ref()
 let renderer: THREE.WebGLRenderer
-let player: Player;
+let player: Player
 let scene: THREE.Scene
-let prevTime = performance.now();
+let prevTime = performance.now()
 
 // camera setup
-let camera: THREE.PerspectiveCamera;
+let camera: THREE.PerspectiveCamera
 
 // used to calculate fps in animate()
-const clock = new THREE.Clock();
-let fps: number;
-let counter = 0;
+const clock = new THREE.Clock()
+let fps: number
+let counter = 0
 
 // is called every frame, changes camera position and velocity
 // only sends updates to backend at 30hz
 function animate() {
-  fps = 1 / clock.getDelta();
-  player.updatePlayer();
+  fps = 1 / clock.getDelta()
+  player.updatePlayer()
   if (counter >= fps / targetHz) {
     // console.log(`${player.getCamera().position.x}  |  ${player.getCamera().position.z}`)
     const time = performance.now()
@@ -162,14 +161,14 @@ function animate() {
         }, {delta: delta}, {jump: player.getIsJumping()}, {doubleJump: player.getIsDoubleJumping()}, {sprinting: player.isSprinting}))
       });
     } catch (fehler) {
-      console.log(fehler);
+      console.log(fehler)
     }
-    prevTime = time;
-    counter = 0;
+    prevTime = time
+    counter = 0
   }
-  counter++;
+  counter++
 
-  renderer.render(scene, camera);
+  renderer.render(scene, camera)
 }
 
 // initially loads the playerModel & attaches playerModel to playerCamera
@@ -196,8 +195,10 @@ function loadPlayerModel(texture: string) {
 }
 
 onMounted(async () => {
-// for rendering the scene, create gameMap in 3d and change window size
-  const {initRenderer, createGameMap, getScene} = GameMapRenderer()
+  // for rendering the scene, create gameMap in 3d and change window size
+  const { initRenderer, createGameMap, getScene } = GameMapRenderer()
+  const gameObjectRenderer = GameObjectRenderer()
+
   scene = getScene()
   renderer = initRenderer(canvasRef.value)
 
@@ -214,12 +215,23 @@ onMounted(async () => {
     console.error('Error when retrieving the gameMap:', error)
   }
 
-  const playerData = await fetchSnackManFromBackend();
-  player = new Player(renderer, playerData.posX, playerData.posY, playerData.posZ, playerData.radius, playerData.speed, playerData.baseSpeed, playerData.sprintMultiplier)
+  const playerData = await fetchSnackManFromBackend()
+  player = new Player(
+    renderer,
+    playerData.posX,
+    playerData.posY,
+    playerData.posZ,
+    playerData.radius,
+    playerData.speed,
+    playerData.baseSpeed,
+    playerData.sprintMultiplier,
+  )
   camera = player.getCamera()
+  camera.add(gameObjectRenderer.listener)
+
   scene.add(player.getControls().object)
 
-  loadPlayerModel(SNACKMAN_TEXTURE);
+  loadPlayerModel(SNACKMAN_TEXTURE)
 
   renderer.render(scene, camera)
   renderer.setAnimationLoop(animate)
@@ -241,42 +253,42 @@ let cooldownAnimationFrame: number | null = null;
 
 // Starts the cooldown animation for the sprint bar, filling it dynamically (this function is mostly AI generated)
 function startCooldownFill(usedSprintTime: number) {
-  if (cooldownAnimationFrame) return; // Prevent starting a new animation if one is already running
+  if (cooldownAnimationFrame) return // Prevent starting a new animation if one is already running
 
-  const cooldownDuration = usedSprintTime * 2 * 1000; // Total cooldown duration in ms
-  const startTime = performance.now();
-  const startValue = sprintData.sprintTimeLeft;
-  const fillAmount = 100 - startValue;
+  const cooldownDuration = usedSprintTime * 2 * 1000 // Total cooldown duration in ms
+  const startTime = performance.now()
+  const startValue = sprintData.sprintTimeLeft
+  const fillAmount = 100 - startValue
 
-  sprintData.isCooldown = true;
+  sprintData.isCooldown = true
 
   /**
    * Recursive function to animate the cooldown fill using requestAnimationFrame.
    */
   function animateFill() {
-    const now = performance.now();
-    const elapsed = now - startTime;
-    const progress = Math.min(elapsed / cooldownDuration, 1);
-    sprintData.sprintTimeLeft = startValue + progress * fillAmount;
+    const now = performance.now()
+    const elapsed = now - startTime
+    const progress = Math.min(elapsed / cooldownDuration, 1)
+    sprintData.sprintTimeLeft = startValue + progress * fillAmount
 
     if (progress < 1) {
       // If the animation is not complete, request the next animation frame
-      cooldownAnimationFrame = requestAnimationFrame(animateFill);
+      cooldownAnimationFrame = requestAnimationFrame(animateFill)
     } else {
-      stopCooldownFill();
-      sprintData.isCooldown = false;
-      sprintData.sprintTimeLeft = 100;
+      stopCooldownFill()
+      sprintData.isCooldown = false
+      sprintData.sprintTimeLeft = 100
     }
   }
 
-  cooldownAnimationFrame = requestAnimationFrame(animateFill);
+  cooldownAnimationFrame = requestAnimationFrame(animateFill)
 }
 
 // Stops the cooldown fill animation and cleans up the animation frame reference. (this function is mostly AI generated)
 function stopCooldownFill() {
   if (cooldownAnimationFrame) {
-    cancelAnimationFrame(cooldownAnimationFrame);
-    cooldownAnimationFrame = null;
+    cancelAnimationFrame(cooldownAnimationFrame)
+    cooldownAnimationFrame = null
   }
 }
 
@@ -284,23 +296,22 @@ const sprintData = reactive({
   sprintTimeLeft: 100, // percentage (0-100)
   isSprinting: false,
   isCooldown: false,
-});
+})
 
 const sprintBarStyle = computed(() => {
-  let color = 'green';
+  let color = 'green'
   if (sprintData.isSprinting) {
-    color = 'red';
+    color = 'red'
   } else if (sprintData.isCooldown) {
-    color = 'blue';
+    color = 'blue'
   }
 
   return {
     width: `${sprintData.sprintTimeLeft}%`,
     backgroundColor: color,
-  };
-});
+  }
+})
 </script>
-
 
 <style>
 .Calories-Overlay {
@@ -343,7 +354,8 @@ const sprintBarStyle = computed(() => {
 
 .sprint-bar-inner {
   height: 100%;
-  transition: width 0.1s ease-out, background-color 0.2s ease-out;
+  transition:
+    width 0.1s ease-out,
+    background-color 0.2s ease-out;
 }
-
 </style>
