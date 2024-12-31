@@ -1,13 +1,13 @@
 <template>
-  <div class ="Main">
-  <canvas ref="canvasRef"></canvas>
-  <div class="sprint-bar">
-    <div class="sprint-bar-inner" :style="sprintBarStyle"></div>
-  </div>
+  <div class="Main">
+    <canvas ref="canvasRef"></canvas>
+    <div class="sprint-bar">
+      <div class="sprint-bar-inner" :style="sprintBarStyle"></div>
+    </div>
 
     <div class="Calories-Overlay" :style="getBackgroundStyle">
       <div class="overlayContent">
-        <img src="@/assets/calories.svg" alt="calories" class="calories-icon" />
+        <img src="@/assets/calories.svg" alt="calories" class="calories-icon"/>
         <p v-if="currentCalories<MAXCALORIES">{{ currentCalories }}kcal</p>
         <p v-else>{{ caloriesMessage }}</p>
       </div>
@@ -19,15 +19,16 @@
 <script setup lang="ts">
 import {computed, onMounted, onUnmounted, reactive, ref} from 'vue'
 import * as THREE from 'three'
-import { Client } from '@stomp/stompjs'
-import { Player } from '@/components/Player';
-import type { IPlayerDTD } from '@/stores/Player/IPlayerDTD';
-import { fetchSnackManFromBackend } from '@/services/SnackManInitService';
-import { GameMapRenderer } from '@/renderer/GameMapRenderer';
-import { useGameMapStore } from '@/stores/gameMapStore';
-import type { IGameMap } from '@/stores/IGameMapDTD';
-import type {IFrontendCaloriesMessageEvent} from "@/services/IFrontendMessageEvent";
-import { GLTFLoader } from 'three/examples/jsm/Addons.js';
+import {Client} from '@stomp/stompjs'
+import {Player} from '@/components/Player';
+import type {IPlayerDTD} from '@/stores/Player/IPlayerDTD';
+import {fetchSnackManFromBackend} from '@/services/SnackManInitService';
+import {GameMapRenderer} from '@/renderer/GameMapRenderer';
+import {useGameMapStore} from '@/stores/gameMapStore';
+import type {IGameMap} from '@/stores/IGameMapDTD';
+import type {IFrontendCaloriesMessageEvent} from "@/services/IFrontendSnackMessageEvent";
+import {GLTFLoader} from 'three/examples/jsm/Addons.js';
+import {initSnackEatingSound} from "@/services/SoundManager";
 
 const WSURL = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/player'
@@ -37,7 +38,7 @@ const UPDATE = '/topic/calories'
 
 //Reaktive Calories Variable
 const MAXCALORIES = 3000;
-const currentCalories  = ref(0);
+const currentCalories = ref(0);
 const caloriesMessage = ref('');
 
 
@@ -83,7 +84,6 @@ stompclient.onConnect = frame => {
     player.setPosition(event.posX, event.posY, event.posZ);
 
 
-
   });
 
   // Calories Verarbeitung
@@ -95,7 +95,7 @@ stompclient.onConnect = frame => {
     if (event.calories !== undefined) {
       currentCalories.value = event.calories;
     }
-    if ( event.message) {
+    if (event.message) {
       caloriesMessage.value = event.message;
     }
   });
@@ -115,11 +115,6 @@ const getBackgroundStyle = computed(() => {
     background: color
   };
 });
-
-
-
-
-
 
 
 stompclient.activate()
@@ -156,7 +151,7 @@ function animate() {
           qY: player.getCamera().quaternion.y,
           qZ: player.getCamera().quaternion.z,
           qW: player.getCamera().quaternion.w
-        }, {delta: delta}, { jump: player.getIsJumping()}, { doubleJump: player.getIsDoubleJumping()}, {sprinting: player.isSprinting}))
+        }, {delta: delta}, {jump: player.getIsJumping()}, {doubleJump: player.getIsDoubleJumping()}, {sprinting: player.isSprinting}))
       });
     } catch (fehler) {
       console.log(fehler);
@@ -228,7 +223,7 @@ function resizeCallback() {
   camera.updateProjectionMatrix()
 }
 
-// SPRINT-BAR 
+// SPRINT-BAR
 let cooldownAnimationFrame: number | null = null;
 
 // Starts the cooldown animation for the sprint bar, filling it dynamically (this function is mostly AI generated)
@@ -295,7 +290,7 @@ const sprintBarStyle = computed(() => {
 
 
 <style>
-.Calories-Overlay{
+.Calories-Overlay {
   color: black;
   position: fixed;
   top: 10px;
