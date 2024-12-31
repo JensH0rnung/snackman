@@ -72,16 +72,19 @@ export const GameObjectRenderer = () => {
     // Add sound to the chicken
     const sound = new THREE.PositionalAudio(listener)
     const audioLoader = new THREE.AudioLoader()
-    audioLoader.load('/src/assets/sounds/chicken_noises.ogg', buffer => {
-      sound.setBuffer(buffer)
-      sound.setRefDistance(5) // maximum volume at x units of distance
-      sound.setMaxDistance(12) // max distance
-      sound.setRolloffFactor(1) // how quickly the volume decreases with increasing distance
-      sound.setDistanceModel('linear') // decrease in volume (linear is a good choice for games)
-      sound.setLoop(true)
-      sound.setVolume(0.5)
-      sound.play()
-    })
+    audioLoader.load(
+      '/src/assets/sounds/chicken/chicken_noises.ogg',
+      buffer => {
+        sound.setBuffer(buffer)
+        sound.setRefDistance(5) // maximum volume at x units of distance
+        sound.setMaxDistance(12) // max distance
+        sound.setRolloffFactor(1) // how quickly the volume decreases with increasing distance
+        sound.setDistanceModel('linear') // decrease in volume (linear is a good choice for games)
+        sound.setLoop(true)
+        sound.setVolume(0.5)
+        sound.play()
+      },
+    )
 
     chicken.add(sound)
 

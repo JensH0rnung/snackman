@@ -1,16 +1,21 @@
-import * as THREE from "three";
+import * as THREE from 'three'
 
-export function initSnackEatingSound(camera: THREE.Camera): THREE.PositionalAudio {
-  const listener = new THREE.AudioListener();
+export function initSnackEatingSound(
+  camera: THREE.Camera,
+): THREE.PositionalAudio {
+  const listener = new THREE.AudioListener()
   camera.add(listener)
 
   const sound = new THREE.PositionalAudio(listener)
-  const audioLoader = new THREE.AudioLoader();
+  const audioLoader = new THREE.AudioLoader()
 
-  audioLoader.load('src/assets/sounds/collect_snack_sound.mp3', function (buffer) {
-    sound.setBuffer(buffer)
-    sound.setRefDistance(20)
-  })
+  audioLoader.load(
+    'src/assets/sounds/collect_snack_sound.ogg',
+    function (buffer) {
+      sound.setBuffer(buffer)
+      sound.setRefDistance(20)
+    },
+  )
 
   return sound
 }
