@@ -1,6 +1,7 @@
 package de.hsrm.mi.swt.snackman.services;
 
 import java.beans.PropertyChangeEvent;
+
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
@@ -16,9 +17,11 @@ import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
 import org.python.core.PyObject;
 import de.hsrm.mi.swt.snackman.messaging.*;
 
@@ -62,7 +65,13 @@ public class MapService {
                 String message = newCalories == snackman.getMAXKCAL() ? "Maximum calories reached!" : "";
                 System.out.println("Listener initilized");
 
-                FrontendMessageCaloriesEvent messageEvent = new FrontendMessageCaloriesEvent(EventType.CALORIES, ChangeType.UPDATE, newCalories, message);
+                FrontendMessageCaloriesEvent messageEvent = new FrontendMessageCaloriesEvent(EventType.INCREASE_CALORIES,
+                        ChangeType.UPDATE, newCalories, message);
+
+                if ((int) event.getOldValue() > (int) event.getNewValue()) {
+                    messageEvent = new FrontendMessageCaloriesEvent(EventType.DECREASE_CALORIES,
+                            ChangeType.UPDATE, newCalories, message);
+                }
 
                 frontendMessageService.sendUpdateCaloriesEvent(messageEvent);
             }

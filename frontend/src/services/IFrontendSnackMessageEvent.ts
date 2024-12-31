@@ -1,7 +1,7 @@
 import type {ISquareDTD} from "@/stores/Square/ISquareDTD";
 import type {IChickenDTD} from "@/stores/Chicken/IChickenDTD";
 
-type EventType = 'SNACK' | 'CHICKEN' | 'CALORIES'
+type EventType = 'SNACK' | 'CHICKEN' | 'INCREASE_CALORIES' | 'DECREASE_CALORIES'
 type ChangeType = 'CREATE' | 'UPDATE' | 'DELETE'
 
 export interface IFrontendSnackMessageEvent {

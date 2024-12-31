@@ -92,12 +92,15 @@ stompclient.onConnect = frame => {
     if (event.calories !== undefined) {
       currentCalories.value = event.calories;
 
-      const soundToPlay = globalSounds.get("eatSnack");
-      if (soundToPlay != undefined) {
-        if (soundToPlay.isPlaying) {
-          soundToPlay.stop();
-        } else {
-          soundToPlay.play();
+      //Play sound when calories increased
+      if (event.eventType === 'INCREASE_CALORIES') {
+        const soundToPlay = globalSounds.get("eatSnack");
+        if (soundToPlay != undefined) {
+          if (soundToPlay.isPlaying) {
+            soundToPlay.stop();
+          } else {
+            soundToPlay.play();
+          }
         }
       }
 
