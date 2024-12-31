@@ -1,7 +1,7 @@
 import * as THREE from 'three'
-import { type IGameMap, MapObjectType } from '@/stores/IGameMapDTD'
-import { useGameMapStore } from '@/stores/gameMapStore'
-import { GameObjectRenderer } from '@/renderer/GameObjectRenderer'
+import {type IGameMap, MapObjectType} from '@/stores/IGameMapDTD'
+import {useGameMapStore} from '@/stores/gameMapStore'
+import {GameObjectRenderer} from '@/renderer/GameObjectRenderer'
 
 /**
  * for rendering the game map
@@ -85,7 +85,7 @@ export const GameMapRenderer = () => {
       }
     }
     // add chickens
-    for (let currentChicken of mapData.chickens) {
+    for (const currentChicken of mapData.chickens) {
       const chickenToAdd = gameObjectRenderer.createChickenOnFloor(
         currentChicken.chickenPosX * DEFAULT_SIDE_LENGTH + OFFSET,
         currentChicken.chickenPosZ * DEFAULT_SIDE_LENGTH + OFFSET,
@@ -102,5 +102,5 @@ export const GameMapRenderer = () => {
     return scene
   }
 
-  return {initRenderer, createGameMap, getScene}
+  return { initRenderer, createGameMap, getScene }
 }
