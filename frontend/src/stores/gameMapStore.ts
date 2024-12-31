@@ -76,7 +76,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
           const savedMeshId = mapData.gameMap.get(change.square.id)!.snack.meshId
 
-          removeMeshFromScene(scene, savedMeshId)
+          removeSnackMeshFromScene(scene, savedMeshId)
 
           mapData.gameMap.set(change.square.id, change.square as ISquare)
         })
@@ -177,7 +177,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
       chicken.meshId = meshId
   }
 
-  function removeMeshFromScene(scene: Scene, meshId: number) {
+  function removeSnackMeshFromScene(scene: Scene, meshId: number) {
     const mesh = scene.getObjectById(meshId)
     if (mesh != undefined) {
       scene.remove(mesh!)

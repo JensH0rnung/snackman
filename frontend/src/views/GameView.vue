@@ -88,7 +88,6 @@ stompclient.onConnect = frame => {
   stompclient.subscribe(UPDATE, message => {
     const event: IFrontendCaloriesMessageEvent = JSON.parse(message.body);
 
-
     // Get Calories
     if (event.calories !== undefined) {
       currentCalories.value = event.calories;
@@ -107,9 +106,7 @@ stompclient.onConnect = frame => {
       caloriesMessage.value = event.message;
     }
   });
-
 }
-
 
 // Kalorien-Overlay Fill berrechnen
 const getBackgroundStyle = computed(() => {

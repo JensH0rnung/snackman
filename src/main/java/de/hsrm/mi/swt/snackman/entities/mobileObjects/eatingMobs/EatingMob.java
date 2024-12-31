@@ -90,9 +90,7 @@ public abstract class EatingMob extends Mob {
             square.setSnack(null);
 
             if ((this) instanceof SnackMan) {
-                System.out.println("Snackman fired calories");
                 propertyChangeSupport.firePropertyChange("currentCalories", oldCalories, kcal);
-                System.out.println("Snackman fired calories");
             }
         }
 
