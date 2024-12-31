@@ -18,17 +18,17 @@
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted, reactive, ref } from 'vue'
 import * as THREE from 'three'
-import {Client} from '@stomp/stompjs'
-import {Player} from '@/components/Player';
-import type {IPlayerDTD} from '@/stores/Player/IPlayerDTD';
-import {fetchSnackManFromBackend} from '@/services/SnackManInitService';
-import {GameMapRenderer} from '@/renderer/GameMapRenderer';
-import {useGameMapStore} from '@/stores/gameMapStore';
-import type {IGameMap} from '@/stores/IGameMapDTD';
-import type {IFrontendCaloriesMessageEvent} from "@/services/IFrontendSnackMessageEvent";
-import {GLTFLoader} from 'three/examples/jsm/Addons.js';
+import { Client } from '@stomp/stompjs'
+import { Player } from '@/components/Player'
+import type { IPlayerDTD } from '@/stores/Player/IPlayerDTD'
+import { fetchSnackManFromBackend } from '@/services/SnackManInitService'
+import { GameMapRenderer } from '@/renderer/GameMapRenderer'
+import { useGameMapStore } from '@/stores/gameMapStore'
+import type { IGameMap } from '@/stores/IGameMapDTD'
+import type { IFrontendCaloriesMessageEvent } from '@/services/IFrontendSnackMessageEvent'
+import { GLTFLoader } from 'three/examples/jsm/Addons.js'
 import { GameObjectRenderer } from '@/renderer/GameObjectRenderer'
-import {initSnackEatingSound} from "@/services/SoundManager";
+import { initSnackEatingSound } from '@/services/SoundManager'
 
 const WSURL = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/player'
@@ -37,14 +37,14 @@ const targetHz = 30
 const UPDATE = '/topic/calories'
 
 //Reaktive Calories Variable
-const MAXCALORIES = 3000;
-const currentCalories = ref(0);
-const caloriesMessage = ref('');
+const MAXCALORIES = 3000
+const currentCalories = ref(0)
+const caloriesMessage = ref('')
 
-const globalSounds = new Map<string, THREE.PositionalAudio>();
+const globalSounds = new Map<string, THREE.PositionalAudio>()
 
-const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb';
-let snackManModel: THREE.Group<THREE.Object3DEventMap>;
+const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb'
+let snackManModel: THREE.Group<THREE.Object3DEventMap>
 // other textures
 
 // stomp
@@ -84,45 +84,42 @@ stompclient.onConnect = frame => {
 
   // Calories Verarbeitung
   stompclient.subscribe(UPDATE, message => {
-    const event: IFrontendCaloriesMessageEvent = JSON.parse(message.body);
+    const event: IFrontendCaloriesMessageEvent = JSON.parse(message.body)
 
     // Get Calories
     if (event.calories !== undefined) {
-      currentCalories.value = event.calories;
+      currentCalories.value = event.calories
 
       //Play sound when calories increased
       if (event.eventType === 'INCREASE_CALORIES') {
-        const soundToPlay = globalSounds.get("eatSnack");
+        const soundToPlay = globalSounds.get('eatSnack')
         if (soundToPlay != undefined) {
           if (soundToPlay.isPlaying) {
-            soundToPlay.stop();
+            soundToPlay.stop()
           } else {
-            soundToPlay.play();
+            soundToPlay.play()
           }
         }
       }
-
     }
     if (event.message) {
-      caloriesMessage.value = event.message;
+      caloriesMessage.value = event.message
     }
-  });
+  })
 }
-
 
 // Kalorien-Overlay Fill berrechnen
 const getBackgroundStyle = computed(() => {
-  const maxCalories = 3000;
+  const maxCalories = 3000
   //Prozent berechnen
-  const percentage = Math.min(currentCalories.value / maxCalories, 1);
+  const percentage = Math.min(currentCalories.value / maxCalories, 1)
 
-  const color = `linear-gradient(to right, #EEC643 ${percentage * 100}%, #5E4A08 ${percentage * 100}%)`;
+  const color = `linear-gradient(to right, #EEC643 ${percentage * 100}%, #5E4A08 ${percentage * 100}%)`
 
   return {
-    background: color
-  };
-});
-
+    background: color,
+  }
+})
 
 stompclient.activate()
 
@@ -152,14 +149,25 @@ function animate() {
     try {
       //Sende and /topic/player/update
       stompclient.publish({
-        destination: DEST + "/update", headers: {},
-        body: JSON.stringify(Object.assign({}, player.getInput(), {
-          qX: player.getCamera().quaternion.x,
-          qY: player.getCamera().quaternion.y,
-          qZ: player.getCamera().quaternion.z,
-          qW: player.getCamera().quaternion.w
-        }, {delta: delta}, {jump: player.getIsJumping()}, {doubleJump: player.getIsDoubleJumping()}, {sprinting: player.isSprinting}))
-      });
+        destination: DEST + '/update',
+        headers: {},
+        body: JSON.stringify(
+          Object.assign(
+            {},
+            player.getInput(),
+            {
+              qX: player.getCamera().quaternion.x,
+              qY: player.getCamera().quaternion.y,
+              qZ: player.getCamera().quaternion.z,
+              qW: player.getCamera().quaternion.w,
+            },
+            { delta: delta },
+            { jump: player.getIsJumping() },
+            { doubleJump: player.getIsDoubleJumping() },
+            { sprinting: player.isSprinting },
+          ),
+        ),
+      })
     } catch (fehler) {
       console.log(fehler)
     }
@@ -173,25 +181,22 @@ function animate() {
 
 // initially loads the playerModel & attaches playerModel to playerCamera
 function loadPlayerModel(texture: string) {
-  const loader = new GLTFLoader();
-  loader.load(
-    texture,
-    (gltf) => {
-      snackManModel = gltf.scene;
+  const loader = new GLTFLoader()
+  loader.load(texture, gltf => {
+    snackManModel = gltf.scene
 
-      snackManModel.scale.set(1, 1, 1);
-      // rotation in radians (Bogenmaß), 180° doesnt work as intended
-      snackManModel.rotation.y = Math.PI;
-      // optional offset for thirdPersonView
-      // snackManModel.position.set(0, -1.55, -5);
+    snackManModel.scale.set(1, 1, 1)
+    // rotation in radians (Bogenmaß), 180° doesnt work as intended
+    snackManModel.rotation.y = Math.PI
+    // optional offset for thirdPersonView
+    // snackManModel.position.set(0, -1.55, -5);
 
-      const snackSound = initSnackEatingSound(player.getCamera())
-      globalSounds.set("eatSnack", snackSound)
-      snackManModel.add(snackSound)
+    const snackSound = initSnackEatingSound(player.getCamera())
+    globalSounds.set('eatSnack', snackSound)
+    snackManModel.add(snackSound)
 
-      player.getCamera().add(snackManModel);
-    }
-  )
+    player.getCamera().add(snackManModel)
+  })
 }
 
 onMounted(async () => {
@@ -249,7 +254,7 @@ function resizeCallback() {
 }
 
 // SPRINT-BAR
-let cooldownAnimationFrame: number | null = null;
+let cooldownAnimationFrame: number | null = null
 
 // Starts the cooldown animation for the sprint bar, filling it dynamically (this function is mostly AI generated)
 function startCooldownFill(usedSprintTime: number) {
