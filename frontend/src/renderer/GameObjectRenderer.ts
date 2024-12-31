@@ -7,8 +7,8 @@ import {ChickenThickness} from '@/stores/Chicken/IChickenDTD'
  * objects are rendered by the GameMapRenderer.ts
  */
 export const GameObjectRenderer = () => {
-  const GROUNDSIZE = 1000
   const listener = new THREE.AudioListener()
+  const GROUNDSIZE = 1000
 
   const createSnackOnFloor = (
     xPosition: number,
@@ -70,21 +70,17 @@ export const GameObjectRenderer = () => {
     chicken.position.set(xPosition, 0, zPosition)
 
     // Add sound to the chicken
-    const listener = new THREE.AudioListener()
     const sound = new THREE.PositionalAudio(listener)
     const audioLoader = new THREE.AudioLoader()
-    audioLoader.load(
-      'frontend/src/assets/sounds/chicken_noises.mp3',
-      buffer => {
-        sound.setBuffer(buffer)
-        sound.setRefDistance(100)
-        sound.setLoop(true)
-        sound.setVolume(50.0)
-      },
-    )
+    audioLoader.load('/src/assets/sounds/chicken_noises.ogg', buffer => {
+      sound.setBuffer(buffer)
+      sound.setRefDistance(30)
+      sound.setLoop(true)
+      sound.setVolume(0.5)
+      sound.play()
+    })
 
     chicken.add(sound)
-    sound.play()
 
     return chicken
   }
@@ -150,5 +146,6 @@ export const GameObjectRenderer = () => {
     createFloorSquare,
     createGround,
     createWall,
+    listener,
   }
 }

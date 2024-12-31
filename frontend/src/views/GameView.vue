@@ -28,6 +28,7 @@ import { useGameMapStore } from '@/stores/gameMapStore';
 import type { IGameMap } from '@/stores/IGameMapDTD';
 import type {IFrontendCaloriesMessageEvent} from "@/services/IFrontendMessageEvent";
 import { GLTFLoader } from 'three/examples/jsm/Addons.js';
+import { GameObjectRenderer } from '@/renderer/GameObjectRenderer'
 
 const WSURL = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/player'
@@ -190,6 +191,7 @@ function loadPlayerModel(texture: string) {
 onMounted(async () => {
 // for rendering the scene, create gameMap in 3d and change window size
   const {initRenderer, createGameMap, getScene} = GameMapRenderer()
+  const gameObjectRenderer = GameObjectRenderer()
   scene = getScene()
   renderer = initRenderer(canvasRef.value)
 
