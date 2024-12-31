@@ -41,9 +41,7 @@ const MAXCALORIES = 3000;
 const currentCalories = ref(0);
 const caloriesMessage = ref('');
 
-
-
-
+const globalSounds = new Map<string, THREE.PositionalAudio>();
 
 const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb';
 let snackManModel: THREE.Group<THREE.Object3DEventMap>;
@@ -94,6 +92,16 @@ stompclient.onConnect = frame => {
     // Get Calories
     if (event.calories !== undefined) {
       currentCalories.value = event.calories;
+
+      const soundToPlay = globalSounds.get("eatSnack");
+      if (soundToPlay != undefined) {
+        if (soundToPlay.isPlaying) {
+          soundToPlay.stop();
+        } else {
+          soundToPlay.play();
+        }
+      }
+
     }
     if (event.message) {
       caloriesMessage.value = event.message;
@@ -166,21 +174,26 @@ function animate() {
 
 // initially loads the playerModel & attaches playerModel to playerCamera
 function loadPlayerModel(texture: string) {
-      const loader = new GLTFLoader();
-      loader.load(
-        texture,
-        (gltf) => {
-            snackManModel = gltf.scene;
+  const loader = new GLTFLoader();
+  loader.load(
+    texture,
+    (gltf) => {
+      snackManModel = gltf.scene;
 
-            snackManModel.scale.set(1, 1, 1);
-            // rotation in radians (Bogenmaß), 180° doesnt work as intended
-            snackManModel.rotation.y = Math.PI;
-            // optional offset for thirdPersonView
-            // snackManModel.position.set(0, -1.55, -5);
-            player.getCamera().add(snackManModel);
-        }
-      )
+      snackManModel.scale.set(1, 1, 1);
+      // rotation in radians (Bogenmaß), 180° doesnt work as intended
+      snackManModel.rotation.y = Math.PI;
+      // optional offset for thirdPersonView
+      // snackManModel.position.set(0, -1.55, -5);
+
+      const snackSound = initSnackEatingSound(player.getCamera())
+      globalSounds.set("eatSnack", snackSound)
+      snackManModel.add(snackSound)
+
+      player.getCamera().add(snackManModel);
     }
+  )
+}
 
 onMounted(async () => {
 // for rendering the scene, create gameMap in 3d and change window size
