@@ -166,22 +166,31 @@ export const useGameMapStore = defineStore('gameMap', () => {
     ) {
       case Direction.NORTH || Direction.SOUTH:
         chickenMesh!.setRotationFromEuler(new THREE.Euler(0))
-        break;
+        break
       case Direction.EAST || Direction.WEST:
         chickenMesh!.setRotationFromEuler(new THREE.Euler(Math.PI / 2))
-        break;
+        break
     }
   }
 
-  function updateWalkingDirection(currentChicken: IChicken, chickenUpdate: IChickenDTD, DEFAULT_SIDE_LENGTH: number, OFFSET: number) {
-    console.log("Chicken moved")
+  function updateWalkingDirection(
+    currentChicken: IChicken,
+    chickenUpdate: IChickenDTD,
+    DEFAULT_SIDE_LENGTH: number,
+    OFFSET: number,
+  ) {
+    console.log('Chicken moved')
     const chickenMesh = scene.getObjectById(currentChicken.meshId)
 
     currentChicken.chickenPosX = chickenUpdate.chickenPosX
     currentChicken.chickenPosZ = chickenUpdate.chickenPosZ
 
     //chickenMesh!.position.lerp(new THREE.Vector3(currentChicken.posX * DEFAULT_SIDE_LENGTH + OFFSET, 0, currentChicken.posZ * DEFAULT_SIDE_LENGTH + OFFSET), CHICKEN_MOVEMENT_SPEED)  // interpolates between original point and new point
-    chickenMesh!.position.set(currentChicken.chickenPosX * DEFAULT_SIDE_LENGTH + OFFSET, 0, currentChicken.chickenPosZ * DEFAULT_SIDE_LENGTH + OFFSET)
+    chickenMesh!.position.set(
+      currentChicken.chickenPosX * DEFAULT_SIDE_LENGTH + OFFSET,
+      0,
+      currentChicken.chickenPosZ * DEFAULT_SIDE_LENGTH + OFFSET,
+    )
   }
 
   function setSnackMeshId(squareId: number, meshId: number) {
@@ -191,9 +200,8 @@ export const useGameMapStore = defineStore('gameMap', () => {
   }
 
   function setChickenMeshId(meshId: number, chickenId: number) {
-    const chicken = mapData.chickens.find(chicken => chicken.id === chickenId);
-    if (chicken != undefined)
-      chicken.meshId = meshId
+    const chicken = mapData.chickens.find(chicken => chicken.id === chickenId)
+    if (chicken != undefined) chicken.meshId = meshId
   }
 
   function removeMeshFromScene(scene: Scene, meshId: number) {
@@ -213,6 +221,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
     startGameMapLiveUpdate,
     setSnackMeshId,
     setChickenMeshId,
-    getScene
-  };
+    getScene,
+  }
 })
