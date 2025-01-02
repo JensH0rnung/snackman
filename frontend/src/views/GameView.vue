@@ -41,6 +41,8 @@ const currentCalories  = ref(0);
 const caloriesMessage = ref('');
 
 
+const modelContainer = new THREE.Group();
+let initialRotationY: number;
 const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb';
 let snackManModel: THREE.Group<THREE.Object3DEventMap>;
 // other textures
@@ -130,11 +132,42 @@ const clock = new THREE.Clock();
 let fps: number;
 let counter = 0;
 
+
+// initially loads the playerModel & attaches playerModel to playerCamera
+function loadPlayerModel(texture: string) {
+      const loader = new GLTFLoader();
+
+      loader.load(
+        texture,
+        (gltf) => {
+            snackManModel = gltf.scene;
+
+            snackManModel.scale.set(1, 1, 1);
+            // rotation in radians (Bogenmaß), 180° doesnt work as intended
+            snackManModel.rotation.y = Math.PI;
+            initialRotationY = snackManModel.rotation.y;
+
+            snackManModel.position.set(0, -1, 0);
+
+            modelContainer.add(snackManModel);
+            modelContainer.position.set(0, -1, 0);
+            modelContainer.quaternion.copy(player.getCamera().quaternion);
+
+            player.getCamera().add(modelContainer);
+        }
+      )
+    }
+
+
 // is called every frame, changes camera position and velocity
 // only sends updates to backend at 30hz
 function animate() {
   fps = 1 / clock.getDelta();
   player.updatePlayer();
+
+  // Aktualisiert Rotation
+  modelContainer.quaternion.copy(player.getCamera().quaternion);
+
   if (counter >= fps / targetHz) {
     // console.log(`${player.getCamera().position.x}  |  ${player.getCamera().position.z}`)
     const time = performance.now()
@@ -160,37 +193,6 @@ function animate() {
 
   renderer.render(scene, camera);
 }
-
-// initially loads the playerModel & attaches playerModel to playerCamera
-function loadPlayerModel(texture: string) {
-      const loader = new GLTFLoader();
-      const modelContainer = new THREE.Group();
-
-      loader.load(
-        texture,
-        (gltf) => {
-            snackManModel = gltf.scene;
-
-            snackManModel.scale.set(1, 1, 1);
-            // rotation in radians (Bogenmaß), 180° doesnt work as intended
-            snackManModel.rotation.y = Math.PI;
-            // optional offset for thirdPersonView
-            // snackManModel.position.set(0, -1.55, -5);
-            // player.getCamera().add(snackManModel);
-            
-            // snackManModelPos = player.getCamera().position;
-            // snackManModelPos.y -= 1;
-            // snackManModel.position.set(snackManModelPos.x, snackManModelPos.y, snackManModelPos.z);
-
-            snackManModel.position.set(0, -1, 0);
-
-            modelContainer.add(snackManModel);
-
-            modelContainer.position.set(0, -1, 0);
-            player.getCamera().add(modelContainer);
-        }
-      )
-    }
 
 onMounted(async () => {
 // for rendering the scene, create gameMap in 3d and change window size
