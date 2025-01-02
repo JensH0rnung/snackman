@@ -72,7 +72,7 @@ export class Player {
     this.speed = speed;
     this.sprintMultiplier = sprintMultiplier;
 
-    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 60)
+    this.camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 60) // FOV
     this.camera.position.set(posX, posY, posZ)
     this.controls = new PointerLockControls(this.camera, renderer.domElement)
     document.addEventListener('keydown', (event) => {
