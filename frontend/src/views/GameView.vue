@@ -41,9 +41,6 @@ const currentCalories  = ref(0);
 const caloriesMessage = ref('');
 
 
-
-
-
 const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb';
 let snackManModel: THREE.Group<THREE.Object3DEventMap>;
 // other textures
@@ -117,11 +114,6 @@ const getBackgroundStyle = computed(() => {
 });
 
 
-
-
-
-
-
 stompclient.activate()
 
 const canvasRef = ref()
@@ -172,6 +164,8 @@ function animate() {
 // initially loads the playerModel & attaches playerModel to playerCamera
 function loadPlayerModel(texture: string) {
       const loader = new GLTFLoader();
+      const modelContainer = new THREE.Group();
+
       loader.load(
         texture,
         (gltf) => {
@@ -182,7 +176,18 @@ function loadPlayerModel(texture: string) {
             snackManModel.rotation.y = Math.PI;
             // optional offset for thirdPersonView
             // snackManModel.position.set(0, -1.55, -5);
-            player.getCamera().add(snackManModel);
+            // player.getCamera().add(snackManModel);
+            
+            // snackManModelPos = player.getCamera().position;
+            // snackManModelPos.y -= 1;
+            // snackManModel.position.set(snackManModelPos.x, snackManModelPos.y, snackManModelPos.z);
+
+            snackManModel.position.set(0, -1, 0);
+
+            modelContainer.add(snackManModel);
+
+            modelContainer.position.set(0, -1, 0);
+            player.getCamera().add(modelContainer);
         }
       )
     }
