@@ -234,6 +234,22 @@ onMounted(async () => {
   camera = player.getCamera()
   camera.add(gameObjectRenderer.listener)
 
+  // add background music
+  const listener = new THREE.AudioListener()
+  camera.add(listener)
+
+  const sound = new THREE.Audio(listener)
+  const audioLoader = new THREE.AudioLoader()
+  audioLoader.load(
+    '/src/assets/sounds/backgroundMusic/funny-background-music_01',
+    buffer => {
+      sound.setBuffer(buffer)
+      sound.setLoop(true)
+      sound.setVolume(0.5)
+      sound.play()
+    },
+  )
+
   scene.add(player.getControls().object)
 
   loadPlayerModel(SNACKMAN_TEXTURE)
