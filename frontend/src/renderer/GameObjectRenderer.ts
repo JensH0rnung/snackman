@@ -1,13 +1,13 @@
 import * as THREE from 'three'
 import {SnackType} from '@/stores/Snack/ISnackDTD'
 import {ChickenThickness} from '@/stores/Chicken/IChickenDTD'
+import {soundManager} from '@/services/SoundManager'
 
 /**
  * for creating the objects in the map
  * objects are rendered by the GameMapRenderer.ts
  */
 export const GameObjectRenderer = () => {
-  const listener = new THREE.AudioListener()
   const GROUNDSIZE = 1000
 
   const createSnackOnFloor = (
@@ -70,24 +70,14 @@ export const GameObjectRenderer = () => {
     chicken.position.set(xPosition, 0, zPosition)
 
     // Add sound to the chicken
-    const sound = new THREE.PositionalAudio(listener)
-    const audioLoader = new THREE.AudioLoader()
-    audioLoader.load(
-      '/src/assets/sounds/chicken/chicken_noises.ogg',
-      buffer => {
-        sound.setBuffer(buffer)
-        sound.setRefDistance(5) // maximum volume at x units of distance
-        sound.setMaxDistance(12) // max distance
-        sound.setRolloffFactor(1) // how quickly the volume decreases with increasing distance
-        sound.setDistanceModel('linear') // decrease in volume (linear is a good choice for games)
-        sound.setLoop(true)
-        sound.setVolume(0.5)
-        sound.play()
-      },
-    )
-
-    chicken.add(sound)
-
+    const chickenSound = soundManager.getSound('chickenNoise')
+    if (chickenSound) {
+      console.log('Playing chicken sound')
+      chicken.add(chickenSound)
+      chickenSound.play()
+    } else {
+      console.error('Chicken sound not loaded')
+    }
     return chicken
   }
 
@@ -152,6 +142,5 @@ export const GameObjectRenderer = () => {
     createFloorSquare,
     createGround,
     createWall,
-    listener,
   }
 }

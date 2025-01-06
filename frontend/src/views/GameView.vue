@@ -28,7 +28,7 @@ import type { IGameMap } from '@/stores/IGameMapDTD'
 import type { IFrontendCaloriesMessageEvent } from '@/services/IFrontendSnackMessageEvent'
 import { GLTFLoader } from 'three/examples/jsm/Addons.js'
 import { GameObjectRenderer } from '@/renderer/GameObjectRenderer'
-import { initSnackEatingSound } from '@/services/SoundManager'
+import { soundManager } from '@/services/SoundManager'
 
 const WSURL = `ws://${window.location.host}/stompbroker`
 const DEST = '/topic/player'
@@ -191,9 +191,10 @@ function loadPlayerModel(texture: string) {
     // optional offset for thirdPersonView
     // snackManModel.position.set(0, -1.55, -5);
 
-    const snackSound = initSnackEatingSound(player.getCamera())
-    globalSounds.set('eatSnack', snackSound)
-    snackManModel.add(snackSound)
+    const eatSnackSound = soundManager.getSound('eatSnack')
+    if (eatSnackSound instanceof THREE.PositionalAudio) {
+      snackManModel.add(eatSnackSound)
+    }
 
     player.getCamera().add(snackManModel)
   })
@@ -202,7 +203,6 @@ function loadPlayerModel(texture: string) {
 onMounted(async () => {
   // for rendering the scene, create gameMap in 3d and change window size
   const { initRenderer, createGameMap, getScene } = GameMapRenderer()
-  const gameObjectRenderer = GameObjectRenderer()
 
   scene = getScene()
   renderer = initRenderer(canvasRef.value)
@@ -232,30 +232,56 @@ onMounted(async () => {
     playerData.sprintMultiplier,
   )
   camera = player.getCamera()
-  camera.add(gameObjectRenderer.listener)
 
-  // add background music
-  const listener = new THREE.AudioListener()
-  camera.add(listener)
+  // init listener with camera
+  soundManager.initListener(camera)
 
-  const sound = new THREE.Audio(listener)
-  const audioLoader = new THREE.AudioLoader()
-  audioLoader.load(
-    '/src/assets/sounds/backgroundMusic/funny-background-music_01',
-    buffer => {
-      sound.setBuffer(buffer)
-      sound.setLoop(true)
-      sound.setVolume(0.5)
-      sound.play()
+  // add collect snack sound
+  soundManager.loadSound(
+    'eatSnack',
+    'src/assets/sounds/collect_snack_sound.ogg',
+    true,
+    {
+      refDistance: 20,
     },
   )
 
+  // add chicken noises
+  soundManager.loadSound(
+    'chickenNoise',
+    '/src/assets/sounds/chicken/chicken_noises.ogg',
+    true,
+    {
+      refDistance: 5,
+      maxDistance: 12,
+      rolloffFactor: 1,
+      distanceModel: 'linear',
+      loop: true,
+      volume: 0.5,
+    },
+  )
+
+  // add background music
+  soundManager.loadSound(
+    'backgroundMusic',
+    '/src/assets/sounds/backgroundMusic/funny-background-music_01.ogg',
+    false,
+    {
+      loop: true,
+      volume: 0.3,
+    },
+  )
+
+  soundManager.playSound('backgroundMusic')
+
   scene.add(player.getControls().object)
 
+  const gameObjectRenderer = GameObjectRenderer()
   loadPlayerModel(SNACKMAN_TEXTURE)
 
   renderer.render(scene, camera)
   renderer.setAnimationLoop(animate)
+
   window.addEventListener('resize', resizeCallback)
 })
 

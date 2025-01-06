@@ -1,17 +1,14 @@
-import { defineStore } from 'pinia'
-import { reactive, readonly } from 'vue'
-import type { IGameMap, IGameMapDTD } from './IGameMapDTD'
-import { fetchGameMapDataFromBackend } from '../services/GameMapDataService.js'
-import { Client } from '@stomp/stompjs'
-import type {
-  IFrontendChickenMessageEvent,
-  IFrontendSnackMessageEvent,
-} from '@/services/IFrontendSnackMessageEvent'
-import type { ISquare } from '@/stores/Square/ISquareDTD'
+import {defineStore} from 'pinia'
+import {reactive, readonly} from 'vue'
+import type {IGameMap, IGameMapDTD} from './IGameMapDTD'
+import {fetchGameMapDataFromBackend} from '../services/GameMapDataService.js'
+import {Client} from '@stomp/stompjs'
+import type {IFrontendChickenMessageEvent, IFrontendSnackMessageEvent,} from '@/services/IFrontendSnackMessageEvent'
+import type {ISquare} from '@/stores/Square/ISquareDTD'
 import * as THREE from 'three'
-import { Scene } from 'three'
-import type { IChicken, IChickenDTD } from '@/stores/Chicken/IChickenDTD'
-import { Direction } from '@/stores/Chicken/IChickenDTD'
+import {Scene} from 'three'
+import type {IChicken, IChickenDTD} from '@/stores/Chicken/IChickenDTD'
+import {Direction} from '@/stores/Chicken/IChickenDTD'
 
 /**
  * Defines the pinia store used for saving the map from
@@ -110,7 +107,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
           const currentChicken = mapData.chickens.find(
             chicken => chicken.id == chickenUpdate.id,
           )
-          console.log('chicken update {}', chickenUpdate)
+          // console.log('chicken update {}', chickenUpdate)
 
           if (currentChicken == undefined) {
             console.error('A chicken is undefined in pinia')
