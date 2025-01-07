@@ -70,7 +70,6 @@ public class Chicken extends EatingMob implements Runnable {
         this.isWalking = true;
         this.lookingDirection = Direction.getRandomDirection();
         log.info("Chicken looking direction is {}", lookingDirection);
-        initJython();
         initTimer();
     }
 
@@ -116,9 +115,11 @@ public class Chicken extends EatingMob implements Runnable {
 
     public List<String> executeMovementSkript(List<String> squares) {
         try {
-            log.debug("Running python chicken script with: {}", squares.toString());
-            pythonInterpreter.exec(interpreterCommand);
-            PyObject func = pythonInterpreter.get("choose_next_square");
+            if (log.isDebugEnabled()) {
+                log.debug("Running python chicken script with: {}", squares);
+            }
+
+            PyObject func = this.pythonInterpreter.get("choose_next_square");
             PyObject result = func.__call__(new PyList(squares));
 
             if (result instanceof PyList) {
@@ -215,10 +216,10 @@ public class Chicken extends EatingMob implements Runnable {
 
             log.debug("Current position is x {} z {}", this.chickenPosX, this.chickenPosZ);
             if (!blockingPath) {
-            List<String> newMove = act(squares);
+                List<String> newMove = act(squares);
 
-            setNewPosition(newMove);
-            log.debug("New position is x {} z {}", this.chickenPosX, this.chickenPosZ);
+                setNewPosition(newMove);
+                log.debug("New position is x {} z {}", this.chickenPosX, this.chickenPosZ);
             }
 
             // consume snack if present
@@ -276,47 +277,6 @@ public class Chicken extends EatingMob implements Runnable {
             }
             currentSquare.setSnack(null);   //set snack to null after consuming it
         }
-    }
-    /**
-     * Executes the chicken's movement script written in Python and determines the
-     * next move.
-     *
-     * @param squares a list of squares visible from the chicken's current position.
-     * @return a list of moves resulting from the Python script's execution.
-     */
-    public List<String> executeMovementSkript(List<String> squares) {
-        try {
-            if (log.isDebugEnabled()) {
-                log.debug("Running python chicken script with: {}", squares);
-            }
-
-            PyObject func = this.pythonInterpreter.get("choose_next_square");
-            PyObject result = func.__call__(new PyList(squares));
-
-            if (result instanceof PyList) {
-                PyList pyList = (PyList) result;
-                return convertPythonList(pyList);
-            }
-
-            throw new Exception("Python chicken script did not load.");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return squares;
-    }
-
-    /**
-     * Converts a Python list to a Java list.
-     *
-     * @param pyList the Python list to convert.
-     * @return the corresponding Java list.
-     */
-    private List<String> convertPythonList(PyList pyList) {
-        List<String> javaList = new ArrayList<>();
-        for (Object item : pyList) {
-            javaList.add(item.toString());
-        }
-        return javaList;
     }
 
     /**
