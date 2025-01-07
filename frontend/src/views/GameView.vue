@@ -42,7 +42,7 @@ const caloriesMessage = ref('');
 
 
 const modelContainer = new THREE.Group();
-let initialRotationY: number;
+// let initialRotationY: number;
 const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb';
 let snackManModel: THREE.Group<THREE.Object3DEventMap>;
 // other textures
@@ -135,6 +135,7 @@ let counter = 0;
 
 // initially loads the playerModel & attaches playerModel to playerCamera
 function loadPlayerModel(texture: string) {
+
       const loader = new GLTFLoader();
 
       loader.load(
@@ -145,7 +146,7 @@ function loadPlayerModel(texture: string) {
             snackManModel.scale.set(1, 1, 1);
             // rotation in radians (Bogenmaß), 180° doesnt work as intended
             snackManModel.rotation.y = Math.PI;
-            initialRotationY = snackManModel.rotation.y;
+            // initialRotationY = snackManModel.rotation.y;
 
             snackManModel.position.set(0, -1, 0);
 
