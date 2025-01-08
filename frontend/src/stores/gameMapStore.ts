@@ -74,8 +74,6 @@ export const useGameMapStore = defineStore('gameMap', () => {
           const change: IFrontendMessageEvent = JSON.parse(message.body)
 
           if (change.changeType == 'CREATE') {
-            console.log('CHANGETYPE CREATE')
-
             mapData.gameMap.set(change.square.id, change.square as ISquare)
             const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
             const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH

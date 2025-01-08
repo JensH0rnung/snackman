@@ -187,17 +187,14 @@ public class Chicken extends EatingMob implements Runnable {
         if (snackOnSquare != null) {
             try {
                 super.gainKcal(snackOnSquare.getCalories());
-                log.info("CHICKEN ID {} consumed snack {} -> now {} kcal and {}", this.id, snackOnSquare.getSnackType().getCalories(), this.getKcal(), this.thickness.name());
                 //set snack to null after consuming it
                 currentSquare.setSnack(null);
                 if (super.getKcal() >= this.MAX_CALORIES) {
-                    log.info("if {} >= {} -> THICKNESS VERY HEAVY", super.getKcal(), this.MAX_CALORIES);
                     this.thickness = Thickness.VERY_HEAVY;
 
                     if (mapService.squareIsBetweenWalls(this.chickenPosX, this.chickenPosZ)) {
                         new Thread(() -> {
                             try {
-                                log.info("--------- CHICKEN ID {} BLOCKING PATH --------", this.id);
                                 blockingPath = true;
                                 Thread.sleep(10000);
                                 blockingPath = false;
@@ -283,32 +280,6 @@ public class Chicken extends EatingMob implements Runnable {
         return squares;
     }
 
-    /**
-     * Adjusts the chicken's thickness state, cycling through predefined values,
-     * and updates its path-blocking status accordingly.
-     */
-    private void incrementThickness() {
-        switch (this.thickness) {
-            case Thickness.THIN:
-                this.thickness = Thickness.SLIGHTLY_THICK;
-                break;
-            case Thickness.SLIGHTLY_THICK:
-                this.thickness = Thickness.MEDIUM;
-                break;
-            case Thickness.MEDIUM:
-                this.thickness = Thickness.HEAVY;
-                break;
-            case Thickness.HEAVY:
-                this.thickness = Thickness.VERY_HEAVY;
-                blockingPath = true;
-                break;
-            case Thickness.VERY_HEAVY:
-                this.thickness = Thickness.THIN;
-                blockingPath = true;
-                break;
-        }
-    }
-
     public boolean getBlockingPath() {
         return this.blockingPath;
     }
@@ -363,7 +334,6 @@ public class Chicken extends EatingMob implements Runnable {
             eggLayingTimer.cancel();
         }
         eggLayingTimer = new Timer();
-        log.info("Starting new timer for chicken ID {}", this.id);
 
         TimerTask task = new TimerTask() {
             public void run() {
@@ -401,7 +371,6 @@ public class Chicken extends EatingMob implements Runnable {
             this.mapService.addEggToSquare(currentSquare, egg);
             // Chicken becomes thin again and has no calories after it has laid an egg
             this.setThickness(Thickness.THIN);
-            log.info("Chicken ID {} layed egg with {} kcal", this.id, egg.getCalories());
             super.setKcal(0);
             startNewTimer();
         } else {

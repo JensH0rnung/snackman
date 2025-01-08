@@ -144,10 +144,8 @@ public class MapService {
                 });
                 break;
             case 'C':
-                log.debug("Initialising chicken");
                 square = new Square(MapObjectType.FLOOR, x, z);
                 Chicken newChicken = new Chicken(square, this);
-                log.info("Initialising chicken with ID: {}", newChicken.getId());
                 Thread chickenThread = new Thread(newChicken);
                 chickenThread.start();
 
@@ -237,9 +235,7 @@ public class MapService {
      */
     public void addEggToSquare(Square square, Snack laidEgg) {
         square.setSnack(laidEgg);
-        log.info("{} kcal egg add to and square {}", laidEgg.getCalories(), square.getId());
         frontendMessageService.sendEvent(new FrontendMessageEvent(EventType.SNACK, ChangeType.CREATE, square));
-        log.info("-------------------------- square: {} with snack {}", square.getId(), square.getSnack().getSnackType());
     }
 
     public void printGameMap() {
