@@ -55,10 +55,150 @@ public class SnackMan extends EatingMob {
         }
     }
     
+    /*
     public void updateJumpPosition(double deltaTime) {
         if (isJumping) {
             this.velocityY += GameConfig.GRAVITY * deltaTime;
             this.setPosY(this.getPosY() + this.velocityY * deltaTime);
+
+            if (this.getPosY() <= GameConfig.SNACKMAN_GROUND_LEVEL) {
+                this.setPosY(GameConfig.SNACKMAN_GROUND_LEVEL);
+                this.isJumping = false;
+                this.velocityY = 0;
+            }
+        }
+    }
+    */
+    public void updateJumpPosition(double deltaTime) {
+        if (isJumping) {
+            this.velocityY += GameConfig.GRAVITY * deltaTime;
+            this.setPosY(this.getPosY() + this.velocityY * deltaTime);
+
+            //NEW (auf Wand landen)
+            if (this.getPosY() <= GameConfig.SQUARE_HEIGHT && squareUnderneathIsWall()) {
+                int wallAlignment = checkWallAlignment();
+                int wallSection = getWallSection();
+
+                switch (wallAlignment) {
+                    case 0:
+                        pushback();
+                        break;
+                    case 1:
+                        if (wallSection == 1 || wallSection == 2) {
+                            push_forward();
+                        } else {
+                            push_backward();
+                        }
+                        break;
+                    case 2:
+                        if (wallSection == 1 || wallSection == 3) {
+                            push_left();
+                        } else {
+                            push_right();
+                        }
+                        break;
+                    case 3:
+                        if (wallSection == 1 || wallSection == 2) {
+                            push_forward();
+                        } else if (wallSection == 4) {
+                            push_right();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case 4:
+                        if (wallSection == 3 || wallSection == 4) {
+                            push_backward();
+                        } else if (wallSection == 2) {
+                            push_right();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case 5:
+                        if (wallSection == 1 || wallSection == 3) {
+                            push_left();
+                        } else if (wallSection == 4) {
+                            push_backward();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case 6:
+                        if (wallSection == 1 || wallSection == 2) {
+                            push_forward();
+                        } else if (wallSection == 3) {
+                            push_left();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case 7:
+                        if (wallSection == 1 || wallSection == 2) {
+                            push_forward();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case 8:
+                        if (wallSection == 2 || wallSection == 4) {
+                            push_right();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case 9:
+                        if (wallSection == 3 || wallSection == 4) {
+                            push_backward();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case 10:
+                        if (wallSection == 1 || wallSection == 3) {
+                            push_left();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case 11:
+                        if (wallSection == 1 || wallSection == 2) {
+                            push_forward();
+                        } else if (wallSection == 3 ) {
+                            push_left();
+                        } else {
+                            push_right();
+                        }
+                        break;
+                    case 12:
+                        if (wallSection == 1) {
+                            push_forward();
+                        } else if (wallSection == 2 || wallSection == 4 ) {
+                            push_right();
+                        } else {
+                            push_backward();
+                        }
+                        break;
+                    case 13:
+                        if (wallSection == 1) {
+                            push_left();
+                        } else if (wallSection == 2) {
+                            push_right();
+                        } else {
+                            push_backward();
+                        }
+                        break;
+                    case 14:
+                        if (wallSection == 1 || wallSection == 3) {
+                            push_left();
+                        } else if (wallSection == 2) {
+                            push_forward();
+                        } else {
+                            push_backward();
+                        }
+                        break;
+                }
+            }
 
             if (this.getPosY() <= GameConfig.SNACKMAN_GROUND_LEVEL) {
                 this.setPosY(GameConfig.SNACKMAN_GROUND_LEVEL);
@@ -90,3 +230,4 @@ public class SnackMan extends EatingMob {
         throw new UnsupportedOperationException("Unimplemented method 'move'");
     }
 }
+
