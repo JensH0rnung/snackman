@@ -10,6 +10,7 @@ import {Scene} from 'three'
 import type {IChicken, IChickenDTD} from '@/stores/Chicken/IChickenDTD'
 import {ChickenThickness, Direction} from '@/stores/Chicken/IChickenDTD'
 import {GameObjectRenderer} from '@/renderer/GameObjectRenderer'
+import {SnackType} from '@/stores/Snack/ISnackDTD'
 
 /**
  * Defines the pinia store used for saving the map from
@@ -66,7 +67,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
         throw new Error('Stompclient with message: ' + frameElement)
       }
 
-      snackStompclient.onConnect = frameElement => {
+      snackStompclient.onConnect = () => {
         console.log('Stompclient connected')
 
         snackStompclient.subscribe(DEST_SQUARE, async message => {
@@ -74,6 +75,8 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
           if (change.changeType == 'CREATE') {
             console.log('CHANGETYPE CREATE')
+
+            mapData.gameMap.set(change.square.id, change.square as ISquare)
             const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
             const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
 
@@ -83,24 +86,27 @@ export const useGameMapStore = defineStore('gameMap', () => {
               square.indexX * DEFAULT_SIDE_LENGTH + OFFSET,
               square.indexZ * DEFAULT_SIDE_LENGTH + OFFSET,
               DEFAULT_SIDE_LENGTH,
-              square.snack?.snackType,
+              change.square.snack?.snackType,
             )
 
             currentSquareInPinia!.snack = square.snack
             scene.add(eggToAdd)
             console.log('egg to add in FE: {}', eggToAdd.id)
-            setSnackMeshId(currentSquareInPinia!.id, eggToAdd.id)
-
-            mapData.gameMap.set(change.square.id, change.square as ISquare)
+            setSnackMeshId(change.square.id, eggToAdd.id)
           } else if (change.changeType == 'UPDATE') {
             // TODO fix bug "Unhandled Promise Rejection: TypeError: null is not an object (evaluating 'mapData.gameMap.get(change.square.id).snack.meshId')"
-            if (mapData.gameMap.get(change.square.id)!.snack.meshId != null) {
-              const savedMeshId = mapData.gameMap.get(change.square.id)!.snack
-                .meshId
+            if (
+              mapData.gameMap.get(change.square.id)!.snack.snackType !=
+              SnackType.EGG
+            ) {
+              if (mapData.gameMap.get(change.square.id)!.snack.meshId != null) {
+                const savedMeshId = mapData.gameMap.get(change.square.id)!.snack
+                  .meshId
 
-              removeMeshFromScene(scene, savedMeshId)
+                removeMeshFromScene(scene, savedMeshId)
 
-              mapData.gameMap.set(change.square.id, change.square as ISquare)
+                mapData.gameMap.set(change.square.id, change.square as ISquare)
+              }
             }
           }
         })
