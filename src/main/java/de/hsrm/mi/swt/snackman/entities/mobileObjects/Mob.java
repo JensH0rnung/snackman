@@ -19,6 +19,9 @@ public abstract class Mob {
     protected MapService mapService;
     private Vector3d spawn;
 
+    //NEW
+    private Vector3d forward;
+
     /**
      * Base constructor for Map with spawn-location at center of Map
      *
@@ -35,6 +38,9 @@ public abstract class Mob {
         radius = GameConfig.SNACKMAN_RADIUS;
         quat = new Quaterniond();
         setCurrentSquareWithIndex(position.x, position.z);
+
+        //NEW (im anderen Konstruktor auch?)
+        forward = new Vector3d(0, 0, -1);
     }
 
     public Mob(MapService mapService) {
@@ -214,7 +220,12 @@ public abstract class Mob {
      */
     public int checkWallCollision(double x, double z) throws IndexOutOfBoundsException {
         if (mapService.getGameMap().getSquareAtIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z)).getType() == MapObjectType.WALL) {
-            return 3;
+            //return 3;
+            if (getPosY() >= GameConfig.SQUARE_HEIGHT) {
+                return 0;
+            } else {
+                return 3;
+            }
         }
 
         int collisionCase = 0;
@@ -239,7 +250,13 @@ public abstract class Mob {
                     0, 1);
             Vector3d line = new Vector3d(0, 1, 0);
             if (calcIntersectionWithLine(x, z, origin, line)) {
-                collisionCase += 1;
+                //collisionCase += 1;
+                //NEW
+                if (getPosY() >= GameConfig.SQUARE_HEIGHT) {
+                    collisionCase = 0;
+                } else {
+                    collisionCase += 1;
+                }
             }
         }
 
@@ -250,7 +267,13 @@ public abstract class Mob {
                     1);
             Vector3d line = new Vector3d(1, 0, 0);
             if (calcIntersectionWithLine(x, z, origin, line)) {
-                collisionCase += 2;
+                //collisionCase += 2;
+                //NEW
+                if (getPosY() >= GameConfig.SQUARE_HEIGHT) {
+                    collisionCase = 0;
+                } else {
+                    collisionCase += 2;
+                }
             }
         }
 
@@ -261,7 +284,13 @@ public abstract class Mob {
                     : currentSquare.getIndexZ() * GameConfig.SQUARE_SIZE;
             double dist = Math.sqrt((diagX - x) * (diagX - x) + (diagZ - z) * (diagZ - z));
             if (dist <= this.radius)
-                collisionCase = 3;
+                //collisionCase = 3;
+                //NEW
+                if (getPosY() >= GameConfig.SQUARE_HEIGHT) {
+                    collisionCase = 0;
+                } else {
+                    collisionCase = 3;
+                }
         }
 
         return collisionCase;
@@ -292,4 +321,260 @@ public abstract class Mob {
     public int calcMapIndexOfCoordinate(double a) {
         return (int) (a / GameConfig.SQUARE_SIZE);
     }
+
+    public boolean squareUnderneathIsWall() {
+        if (mapService.getGameMap().getSquareAtIndexXZ(calcMapIndexOfCoordinate(position.x), calcMapIndexOfCoordinate(position.z)).getType() == MapObjectType.WALL) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //NEW
+    //PUSHBACK
+    public void pushback() {
+        //Umliegende Elemente überprüfen.
+        //int wallAlignment = checkWallAlignment();
+        //int wallSection = getWallSection();
+
+        double stepDistance = 0.1;
+        //double halfWidthBox = radius;
+        //double halfLengthBox = radius;
+
+        //double minXBox = position.x - halfWidthBox;
+        //double maxXBox = position.x + halfWidthBox;
+        //double minZBox = position.z - halfLengthBox;
+        //double maxZBox = position.z + halfLengthBox;
+
+        Vector3d backward = new Vector3d(forward).normalize().negate();
+
+        while (squareUnderneathIsWall()) {
+            Vector3d displacement = new Vector3d(backward).mul(stepDistance);
+            displacement.y = 0;
+            position.add(displacement);
+        }
+        position.y = GameConfig.SNACKMAN_GROUND_LEVEL;
+
+        //Verschiebe zusätzlich um den Radius entlang des Pushback-Vektors.
+        Vector3d additionalDisplacement = new Vector3d(backward).mul(radius);
+        additionalDisplacement.y = 0;
+        position.add(additionalDisplacement);
+    }
+
+
+
+    //NEW
+    //PUSH FORWARD
+    public void push_forward() {
+        double stepDistance = 0.1;
+        Vector3d pushForwardVector = new Vector3d(0, 0, 1);
+
+        while (squareUnderneathIsWall()) {
+            Vector3d displacement = new Vector3d(pushForwardVector).mul(stepDistance);
+            displacement.y = 0;
+            position.add(displacement);
+        }
+        position.y = GameConfig.SNACKMAN_GROUND_LEVEL;
+
+        Vector3d additionalDisplacement = new Vector3d(pushForwardVector).mul(radius);
+        additionalDisplacement.y = 0;
+        position.add(additionalDisplacement);
+    }
+
+    //NEW
+    //PUSH BACKWARD
+    public void push_backward() {
+        double stepDistance = 0.1;
+        Vector3d pushBackwardVector = new Vector3d(0, 0, -1);
+
+        while (squareUnderneathIsWall()) {
+            Vector3d displacement = new Vector3d(pushBackwardVector).mul(stepDistance);
+            displacement.y = 0;
+            position.add(displacement);
+        }
+        position.y = GameConfig.SNACKMAN_GROUND_LEVEL;
+
+        Vector3d additionalDisplacement = new Vector3d(pushBackwardVector).mul(radius);
+        additionalDisplacement.y = 0;
+        position.add(additionalDisplacement);
+    }
+
+    //NEW
+    //PUSH LEFT
+    public void push_left() {
+        double stepDistance = 0.1;
+        Vector3d pushLeftVector = new Vector3d(-1, 0, 0);
+
+        while (squareUnderneathIsWall()) {
+            Vector3d displacement = new Vector3d(pushLeftVector).mul(stepDistance);
+            displacement.y = 0;
+            position.add(displacement);
+        }
+        position.y = GameConfig.SNACKMAN_GROUND_LEVEL;
+
+        Vector3d additionalDisplacement = new Vector3d(pushLeftVector).mul(radius);
+        additionalDisplacement.y = 0;
+        position.add(additionalDisplacement);
+    }
+
+    //NEW
+    //PUSH RIGHT
+    public void push_right() {
+        double stepDistance = 0.1;
+        Vector3d pushRightVector = new Vector3d(1, 0, 0);
+
+        while (squareUnderneathIsWall()) {
+            Vector3d displacement = new Vector3d(pushRightVector).mul(stepDistance);
+            displacement.y = 0;
+            position.add(displacement);
+        }
+        position.y = GameConfig.SNACKMAN_GROUND_LEVEL;
+
+        Vector3d additionalDisplacement = new Vector3d(pushRightVector).mul(radius);
+        additionalDisplacement.y = 0;
+        position.add(additionalDisplacement);
+    }
+
+
+
+
+
+
+
+    //NEW
+    //CHECK WALL ALIGNMENT
+    public int checkWallAlignment() {
+        int mobX = calcMapIndexOfCoordinate(position.x);
+        int mobZ = calcMapIndexOfCoordinate(position.z);
+    
+        // Prüfen, ob links, rechts, oben und/oder unten Wall-Elemente sind
+        boolean leftWall = mapService.getGameMap().getSquareAtIndexXZ(mobX - 1, mobZ).getType() == MapObjectType.WALL;
+        boolean rightWall = mapService.getGameMap().getSquareAtIndexXZ(mobX + 1, mobZ).getType() == MapObjectType.WALL;
+        boolean topWall = mapService.getGameMap().getSquareAtIndexXZ(mobX, mobZ - 1).getType() == MapObjectType.WALL;
+        boolean bottomWall = mapService.getGameMap().getSquareAtIndexXZ(mobX, mobZ + 1).getType() == MapObjectType.WALL;
+    
+        // Bedingung: links und rechts
+        if (leftWall && rightWall && !topWall && !bottomWall) {
+            return 1;
+        }
+    
+        // Bedingung: oben und unten
+        if (topWall && bottomWall && !leftWall && !rightWall) {
+            return 2;
+        }
+
+
+        // Bedingung: links und unten
+        if (!topWall && bottomWall && leftWall && !rightWall) {
+            return 3;
+        }
+
+        // Bedingung: links und oben
+        if (topWall && !bottomWall && leftWall && !rightWall) {
+            return 4;
+        }
+
+        // Bedingung: oben und rechts
+        if (topWall && !bottomWall && !leftWall && rightWall) {
+            return 5;
+        }
+
+        // Bedingung: unten und rechts
+        if (!topWall && bottomWall && !leftWall && rightWall) {
+            return 6;
+        }
+
+
+        // Bedingung: links, unten und rechts
+        if (!topWall && bottomWall && leftWall && rightWall) {
+            return 7;
+        }
+
+        // Bedingung: links, oben und unten
+        if (topWall && bottomWall && leftWall && !rightWall) {
+            return 8;
+        }
+
+        // Bedingung: links, oben und rechts
+        if (topWall && !bottomWall && leftWall && rightWall) {
+            return 9;
+        }
+
+        // Bedingung: oben, unten und rechts
+        if (topWall && bottomWall && !leftWall && rightWall) {
+            return 10;
+        }
+
+
+        // Bedingung: unten
+        if (!topWall && bottomWall && !leftWall && !rightWall) {
+            return 11;
+        }
+
+        // Bedingung: links
+        if (!topWall && !bottomWall && leftWall && !rightWall) {
+            return 12;
+        }
+
+        // Bedingung: oben
+        if (topWall && !bottomWall && !leftWall && !rightWall) {
+            return 13;
+        }
+
+        // Bedingung: rechts
+        if (!topWall && !bottomWall && !leftWall && rightWall) {
+            return 14;
+        }
+
+
+        // Keine der Bedingungen erfüllt
+        return 0;
+    }
+    
+
+    //NEW
+    //GET WALL SECTION
+    public int getWallSection() {
+        // Die Position des Mobs auf der Karte berechnen
+        int mobX = calcMapIndexOfCoordinate(position.x);
+        int mobZ = calcMapIndexOfCoordinate(position.z);
+        Square square = mapService.getGameMap().getSquareAtIndexXZ(mobX, mobZ);
+        long idOfSquare = square.getId();
+
+        double tempX = position.x;
+        double tempZ = position.z;
+    
+        while (mapService.getGameMap().getSquareAtIndexXZ(calcMapIndexOfCoordinate(tempX), calcMapIndexOfCoordinate(tempZ)).getId() == idOfSquare) {
+            tempX = tempX - 1;
+        }
+
+        while (mapService.getGameMap().getSquareAtIndexXZ(calcMapIndexOfCoordinate(tempX), calcMapIndexOfCoordinate(tempZ)).getId() == idOfSquare) {
+            tempZ = tempZ - 1;
+        }
+
+        // Die Koordinaten des Wall-Elements
+        double wallCenterX = tempX + (GameConfig.SQUARE_SIZE / 2);
+        double wallCenterZ = tempZ + (GameConfig.SQUARE_SIZE / 2);
+    
+
+
+        //Berechnung der vier Bereiche:
+        //Vergleiche die Position des Mobs mit dem Zentrum des Wall-Elements
+        boolean isAboveCenter = position.z < wallCenterZ; // Über dem Zentrum?
+        boolean isLeftOfCenter = position.x < wallCenterX; // Links vom Zentrum?
+    
+        //Bestimmen des Bereichs basierend auf der Position des Mobs
+        if (isAboveCenter && isLeftOfCenter) {
+            return 1; // Bereich 1 (oben links)
+        } else if (isAboveCenter && !isLeftOfCenter) {
+            return 2; // Bereich 2 (oben rechts)
+        } else if (!isAboveCenter && isLeftOfCenter) {
+            return 3; // Bereich 3 (unten links)
+        } else if (!isAboveCenter && !isLeftOfCenter) {
+            return 4; // Bereich 4 (unten rechts)
+        }
+    
+        return 0; //Keine gültige Bereichszuordnung
+    }
 }
+
