@@ -73,6 +73,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
           const change: IFrontendMessageEvent = JSON.parse(message.body)
 
           if (change.changeType == 'CREATE') {
+            console.log('CHANGETYPE CREATE')
             const OFFSET = mapData.DEFAULT_SQUARE_SIDE_LENGTH / 2
             const DEFAULT_SIDE_LENGTH = mapData.DEFAULT_SQUARE_SIDE_LENGTH
 
@@ -87,6 +88,7 @@ export const useGameMapStore = defineStore('gameMap', () => {
 
             currentSquareInPinia!.snack = square.snack
             scene.add(eggToAdd)
+            console.log('egg to add in FE: {}', eggToAdd.id)
             setSnackMeshId(currentSquareInPinia!.id, eggToAdd.id)
 
             mapData.gameMap.set(change.square.id, change.square as ISquare)

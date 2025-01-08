@@ -10,7 +10,6 @@ import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Direction;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import de.hsrm.mi.swt.snackman.messaging.*;
-
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,6 +147,7 @@ public class MapService {
                 log.debug("Initialising chicken");
                 square = new Square(MapObjectType.FLOOR, x, z);
                 Chicken newChicken = new Chicken(square, this);
+                log.info("Initialising chicken with ID: {}", newChicken.getId());
                 Thread chickenThread = new Thread(newChicken);
                 chickenThread.start();
 
@@ -237,8 +237,9 @@ public class MapService {
      */
     public void addEggToSquare(Square square, Snack laidEgg) {
         square.setSnack(laidEgg);
-        log.debug("{} kcal egg add to square {} and square {}", laidEgg.getCalories(), square.getId(), square.getId());
+        log.info("{} kcal egg add to and square {}", laidEgg.getCalories(), square.getId());
         frontendMessageService.sendEvent(new FrontendMessageEvent(EventType.SNACK, ChangeType.CREATE, square));
+        log.info("-------------------------- square: {} with snack {}", square.getId(), square.getSnack().getSnackType());
     }
 
     public void printGameMap() {
@@ -258,17 +259,17 @@ public class MapService {
         return gameMap.getSquareAtIndexXZ(x, z);
     }
 
-    public boolean squareIsBetweenWalls(int x, int z){
+    public boolean squareIsBetweenWalls(int x, int z) {
         Square squareAbove = this.gameMap.getSquareAtIndexXZ(x - 1, z);
         Square squareBelow = this.gameMap.getSquareAtIndexXZ(x + 1, z);
         Square squareRight = this.gameMap.getSquareAtIndexXZ(x, z + 1);
         Square squareLeft = this.gameMap.getSquareAtIndexXZ(x, z - 1);
 
-        if((squareAbove.getType() == MapObjectType.WALL) && (squareBelow.getType() == MapObjectType.WALL)){
+        if ((squareAbove.getType() == MapObjectType.WALL) && (squareBelow.getType() == MapObjectType.WALL)) {
             return true;
         }
 
-        if((squareRight.getType() == MapObjectType.WALL) && (squareLeft.getType() == MapObjectType.WALL)){
+        if ((squareRight.getType() == MapObjectType.WALL) && (squareLeft.getType() == MapObjectType.WALL)) {
             return true;
         }
 
@@ -283,7 +284,7 @@ public class MapService {
         return snackman;
     }
 
-    public void setSquare(Square square, int x, int y){
+    public void setSquare(Square square, int x, int y) {
         gameMap.setGameMap(square, x, y);
     }
 }

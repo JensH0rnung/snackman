@@ -1,12 +1,6 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
-import java.nio.file.Paths;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.Snack;
 import de.hsrm.mi.swt.snackman.entities.mapObject.snack.SnackType;
@@ -17,6 +11,10 @@ import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.nio.file.Paths;
 import java.util.*;
 
 /**
@@ -28,15 +26,15 @@ public class Chicken extends EatingMob implements Runnable {
     private static long idCounter = 0;
     private final PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(this);
     private final Logger log = LoggerFactory.getLogger(Chicken.class);
+    private final int WAITING_TIME = GameConfig.WAITING_TIME;  // in ms
+    private final int MAX_CALORIES = GameConfig.MAX_KALORIEN;
+    private final int CALORIES_PER_SIXTH = (MAX_CALORIES / 6);
     private long id;
     private int chickenPosX, chickenPosZ;
     private boolean timerRestarted = false;
     private boolean isWalking;
     private boolean blockingPath = false;
     private boolean isScared = false;
-    private final int WAITING_TIME = GameConfig.WAITING_TIME;  // in ms
-    private final int MAX_CALORIES = GameConfig.MAX_KALORIEN;
-    private final int CALORIES_PER_SIXTH = (MAX_CALORIES / 6);
     private Timer eggLayingTimer;
     // python
     private PythonInterpreter pythonInterpreter = null;
@@ -51,7 +49,7 @@ public class Chicken extends EatingMob implements Runnable {
         this.fileName = "ChickenMovementSkript";
     }
 
-    public Chicken(String fileName){
+    public Chicken(String fileName) {
         super(null);
         this.fileName = fileName;
         initJython();
@@ -66,17 +64,24 @@ public class Chicken extends EatingMob implements Runnable {
         this.fileName = "ChickenMovementSkript";
         this.isWalking = true;
         this.lookingDirection = Direction.getRandomDirection();
-        log.info("Chicken looking direction is {}", lookingDirection);
+        log.debug("Chicken looking direction is {}", lookingDirection);
         initJython();
         initTimer();
     }
 
-    public List<String> act(List<String> squares){
+    /**
+     * Method to generate the next id of a new Square. It is synchronized because of thread-safety.
+     *
+     * @return the next incremented id
+     */
+    private synchronized static long generateId() {
+        return idCounter++;
+    }
+
+    public List<String> act(List<String> squares) {
         List<String> result = executeMovementSkript(squares);
         return result;
     }
-
-
 
     /**
      * Converts a Python list to a Java list.
@@ -91,15 +96,6 @@ public class Chicken extends EatingMob implements Runnable {
         }
         log.debug("Python script result is {}", javaList);
         return javaList;
-    }
-
-    /**
-     * Method to generate the next id of a new Square. It is synchronized because of thread-safety.
-     *
-     * @return the next incremented id
-     */
-    private synchronized static long generateId() {
-        return idCounter++;
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
@@ -163,8 +159,6 @@ public class Chicken extends EatingMob implements Runnable {
 
             if (!blockingPath) {
                 log.debug("Current position is x {} z {}", this.chickenPosX, this.chickenPosZ);
-                //super.mapService.printGameMap();
-                //System.out.println("---------------------------------");
 
                 List<String> newMove = act(squares);
 
@@ -181,6 +175,7 @@ public class Chicken extends EatingMob implements Runnable {
             }
         }
     }
+
     /**
      * Collects the snack on the square if there is one.
      * If there is one that remove it from the square.
@@ -192,14 +187,17 @@ public class Chicken extends EatingMob implements Runnable {
         if (snackOnSquare != null) {
             try {
                 super.gainKcal(snackOnSquare.getCalories());
+                log.info("CHICKEN ID {} consumed snack {} -> now {} kcal and {}", this.id, snackOnSquare.getSnackType().getCalories(), this.getKcal(), this.thickness.name());
                 //set snack to null after consuming it
                 currentSquare.setSnack(null);
                 if (super.getKcal() >= this.MAX_CALORIES) {
+                    log.info("if {} >= {} -> THICKNESS VERY HEAVY", super.getKcal(), this.MAX_CALORIES);
                     this.thickness = Thickness.VERY_HEAVY;
 
                     if (mapService.squareIsBetweenWalls(this.chickenPosX, this.chickenPosZ)) {
                         new Thread(() -> {
                             try {
+                                log.info("--------- CHICKEN ID {} BLOCKING PATH --------", this.id);
                                 blockingPath = true;
                                 Thread.sleep(10000);
                                 blockingPath = false;
@@ -365,6 +363,7 @@ public class Chicken extends EatingMob implements Runnable {
             eggLayingTimer.cancel();
         }
         eggLayingTimer = new Timer();
+        log.info("Starting new timer for chicken ID {}", this.id);
 
         TimerTask task = new TimerTask() {
             public void run() {
@@ -402,6 +401,7 @@ public class Chicken extends EatingMob implements Runnable {
             this.mapService.addEggToSquare(currentSquare, egg);
             // Chicken becomes thin again and has no calories after it has laid an egg
             this.setThickness(Thickness.THIN);
+            log.info("Chicken ID {} layed egg with {} kcal", this.id, egg.getCalories());
             super.setKcal(0);
             startNewTimer();
         } else {
