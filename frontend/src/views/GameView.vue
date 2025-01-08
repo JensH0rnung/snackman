@@ -42,7 +42,6 @@ const caloriesMessage = ref('');
 
 
 const modelContainer = new THREE.Group();
-// let initialRotationY: number;
 const SNACKMAN_TEXTURE: string = 'src/assets/kirby.glb';
 let snackManModel: THREE.Group<THREE.Object3DEventMap>;
 // other textures
@@ -133,26 +132,35 @@ let fps: number;
 let counter = 0;
 
 
-// initially loads the playerModel & attaches playerModel to playerCamera
-function loadPlayerModel(texture: string) {
+/**
+ * initially loads the playerModel & attaches playerModel to playerCamera
+ * 
+ * @param model - model, which needs to be loaded
+ */
+function loadPlayerModel(model: string) {
 
       const loader = new GLTFLoader();
 
       loader.load(
-        texture,
+        model,
         (gltf) => {
             snackManModel = gltf.scene;
 
             snackManModel.scale.set(1, 1, 1);
+            // initial rotation so model looks in the same direction as the camera (forward)
             // rotation in radians (Bogenmaß), 180° doesnt work as intended
             snackManModel.rotation.y = Math.PI;
-            // initialRotationY = snackManModel.rotation.y;
 
+            // offset, model is displayed on the floor (underneath the camera)
             snackManModel.position.set(0, -1, 0);
-
             modelContainer.add(snackManModel);
             modelContainer.position.set(0, -1, 0);
-            modelContainer.quaternion.copy(player.getCamera().quaternion);
+
+            // TODO fix rotation - Issue #182
+            modelContainer.setRotationFromQuaternion(player.getCamera().quaternion);
+
+            // console.log("Camera Rotation - ", player.getCamera().quaternion);
+            // console.log("SnackmanModel Rotation - ", snackManModel.quaternion);
 
             player.getCamera().add(modelContainer);
         }
