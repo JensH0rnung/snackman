@@ -263,3 +263,5 @@ public class SnackMan extends EatingMob {
         this.sprintHandler = sprintHandler;
     }
 }
+
+
