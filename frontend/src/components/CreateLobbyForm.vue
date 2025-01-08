@@ -3,8 +3,10 @@
         <h1 id="title"> New Lobby </h1>
 
         <form id="form" @submit.prevent="createLobby">
-            <label>Enter Name: </label>
-            <input v-model.trim="lobbyName" type="text">
+            <label>
+                Enter Name:
+                <input v-model.trim="lobbyName" type="text">
+            </label>
             <p
                 id="error-message"
                 v-if="errorMessage"> 
@@ -33,7 +35,7 @@
 <script setup lang="ts">
     import SmallNavButton from '@/components/SmallNavButton.vue';
     import { useRouter } from 'vue-router';
-    import { computed, onMounted, ref } from 'vue';
+    import { ref } from 'vue';
     import { useLobbiesStore } from '@/stores/Lobby/lobbiesstore';
     import type { IPlayerClientDTD } from '@/stores/Lobby/IPlayerClientDTD';
 
