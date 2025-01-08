@@ -333,18 +333,8 @@ public abstract class Mob {
     //NEW
     //PUSHBACK
     public void pushback() {
-        //Umliegende Elemente überprüfen.
-        //int wallAlignment = checkWallAlignment();
-        //int wallSection = getWallSection();
 
         double stepDistance = 0.1;
-        //double halfWidthBox = radius;
-        //double halfLengthBox = radius;
-
-        //double minXBox = position.x - halfWidthBox;
-        //double maxXBox = position.x + halfWidthBox;
-        //double minZBox = position.z - halfLengthBox;
-        //double maxZBox = position.z + halfLengthBox;
 
         Vector3d backward = new Vector3d(forward).normalize().negate();
 
@@ -360,8 +350,6 @@ public abstract class Mob {
         additionalDisplacement.y = 0;
         position.add(additionalDisplacement);
     }
-
-
 
     //NEW
     //PUSH FORWARD

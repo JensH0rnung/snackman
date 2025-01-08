@@ -48,27 +48,12 @@ public class SnackMan extends EatingMob {
 
     }
 
-    /*
-    public void updateJumpPosition(double deltaTime) {
-        if (isJumping) {
-            this.velocityY += GameConfig.GRAVITY * deltaTime;
-            setPosY(getPosY() + velocityY * deltaTime);
-
-            if (getPosY() <= GameConfig.SNACKMAN_GROUND_LEVEL) {
-                setPosY(GameConfig.SNACKMAN_GROUND_LEVEL);
-                this.isJumping = false;
-                this.velocityY = 0;
-            }
-        }
-    }
-    */
     //NEW JUMP OVER WALL
     public void updateJumpPosition(double deltaTime) {
         if (isJumping) {
             this.velocityY += GameConfig.GRAVITY * deltaTime;
             this.setPosY(this.getPosY() + this.velocityY * deltaTime);
 
-            //NEW (auf Wand landen)
             if (this.getPosY() <= GameConfig.SQUARE_HEIGHT && squareUnderneathIsWall()) {
                 int wallAlignment = checkWallAlignment();
                 int wallSection = getWallSection();
