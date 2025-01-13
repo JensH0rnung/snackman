@@ -13,9 +13,9 @@ public class GameConfig {
     public static final double SNACKMAN_SPRINT_MULTIPLIER = 1.5;
 
     //SNACKMAN JUMPING PARAM
-    public static final double JUMP_STRENGTH = 8;
+    public static final double JUMP_STRENGTH = 7;
     public static final double DOUBLEJUMP_STRENGTH = JUMP_STRENGTH * 0.1;
-    public static final double GRAVITY = -20;
+    public static final double GRAVITY = -25;
 
     //Chicken
     public static final int WAITING_TIME = 2000;

@@ -1,13 +1,13 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs;
 
-import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
+import de.hsrm.mi.swt.snackman.entities.mechanics.SprintHandler;
 import de.hsrm.mi.swt.snackman.services.MapService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Component
 public class SnackMan extends EatingMob {
@@ -16,6 +16,7 @@ public class SnackMan extends EatingMob {
     private double velocityY = 0.0;
     private boolean isSprinting = false;
     private SprintHandler sprintHandler = new SprintHandler();
+    private boolean hasDoubleJumped = false;
 
     @Autowired
     public SnackMan(MapService mapService) {
@@ -35,17 +36,23 @@ public class SnackMan extends EatingMob {
         if (!isJumping && getKcal() >= 100) {
                 this.velocityY = GameConfig.JUMP_STRENGTH;
                 this.isJumping = true;
+                this.hasDoubleJumped = false;
                 setKcal(getKcal() - 100);
+                System.out.println("\nhasDoubleJumped: " + hasDoubleJumped + "\n");
             }
 
     }
 
     public void doubleJump() {
+        //if (isJumping && !hasDoubleJumped && getKcal() >= 100) {
         if (isJumping && getKcal() >= 100) {
-                this.velocityY += GameConfig.DOUBLEJUMP_STRENGTH;
-                setKcal(getKcal() - 100);
-            }
-
+            this.velocityY += GameConfig.DOUBLEJUMP_STRENGTH;
+            subtractCaloriesDoubleJump();
+            this.hasDoubleJumped = true;
+            //setKcal(getKcal() - 100);
+            System.out.println("\ngetkcal: " + getKcal() + "\n");
+            System.out.println("\nhasDoubleJumped: " + hasDoubleJumped + "\n");
+        }
     }
 
     //NEW JUMP OVER WALL
@@ -183,7 +190,19 @@ public class SnackMan extends EatingMob {
                 this.setPosY(GameConfig.SNACKMAN_GROUND_LEVEL);
                 this.isJumping = false;
                 this.velocityY = 0;
+                this.hasDoubleJumped = false;
+                System.out.println("\nhasDoubleJumped: " + hasDoubleJumped + "\n");
             }
+        }
+    }
+
+    private void subtractCaloriesSingleJump() {
+
+    }
+
+    private void subtractCaloriesDoubleJump() {
+        if (!hasDoubleJumped) {
+            setKcal(getKcal() - 100);
         }
     }
 
