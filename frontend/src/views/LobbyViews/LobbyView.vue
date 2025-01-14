@@ -195,6 +195,11 @@ function backToLobbyListView() {
   router.push({name: 'LobbyListView'})
 }
 
+// Leave Lobby with return-button of browser
+window.onpopstate = function(event){
+  leaveLobby()
+}
+
 /**
  * Leaves the current lobby. If the player is the admin, it will remove other members from the lobby first.
  * After leaving the lobby, the user is redirected to the Lobby List View.
