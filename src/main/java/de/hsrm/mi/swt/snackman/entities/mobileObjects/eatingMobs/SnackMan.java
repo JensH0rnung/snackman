@@ -19,6 +19,7 @@ public class SnackMan extends EatingMob {
     private double velocityY = 0.0;
     private boolean isSprinting = false;
     private SprintHandler sprintHandler = new SprintHandler();
+    private boolean hasDoubleJumped = false;
 
     public SnackMan(GameMap gameMap, Square currentSquare, double posX, double posY, double posZ) {
         this(gameMap, GameConfig.SNACKMAN_SPEED, GameConfig.SNACKMAN_RADIUS, posX, posY, posZ);
@@ -45,31 +46,176 @@ public class SnackMan extends EatingMob {
     //JUMPING
     public void jump() {
         if (!isJumping && getKcal() >= 100) {
-            this.velocityY = GameConfig.JUMP_STRENGTH;
-            this.isJumping = true;
-            setKcal(getKcal() - 100);
-        }
+                this.velocityY = GameConfig.JUMP_STRENGTH;
+                this.isJumping = true;
+                this.hasDoubleJumped = false;
+                //setKcal(getKcal() - 100);
+                subtractCaloriesSingleJump();
+                System.out.println("\nhasDoubleJumped: " + hasDoubleJumped + "\n");
+            }
 
     }
 
     public void doubleJump() {
+        //if (isJumping && !hasDoubleJumped && getKcal() >= 100) {
         if (isJumping && getKcal() >= 100) {
             this.velocityY += GameConfig.DOUBLEJUMP_STRENGTH;
-            setKcal(getKcal() - 100);
+            subtractCaloriesDoubleJump();
+            this.hasDoubleJumped = true;
+            //setKcal(getKcal() - 100);
+            System.out.println("\ngetkcal: " + getKcal() + "\n");
+            System.out.println("\nhasDoubleJumped: " + hasDoubleJumped + "\n");
         }
-
     }
 
+    //NEW JUMP OVER WALL
     public void updateJumpPosition(double deltaTime) {
         if (isJumping) {
             this.velocityY += GameConfig.GRAVITY * deltaTime;
-            setPosY(getPosY() + velocityY * deltaTime);
+            this.setPosY(this.getPosY() + this.velocityY * deltaTime);
 
-            if (getPosY() <= GameConfig.SNACKMAN_GROUND_LEVEL) {
-                setPosY(GameConfig.SNACKMAN_GROUND_LEVEL);
+            if (this.getPosY() <= GameConfig.SQUARE_HEIGHT && squareUnderneathIsWall()) {
+                int wallAlignment = checkWallAlignment();
+                int wallSection = getWallSection();
+
+                switch (wallAlignment) {
+                    case 0:
+                        pushback();
+                        break;
+                    case 1:
+                        if (wallSection == 1 || wallSection == 2) {
+                            push_forward();
+                        } else {
+                            push_backward();
+                        }
+                        break;
+                    case 2:
+                        if (wallSection == 1 || wallSection == 3) {
+                            push_left();
+                        } else {
+                            push_right();
+                        }
+                        break;
+                    case 3:
+                        if (wallSection == 1 || wallSection == 2) {
+                            push_forward();
+                        } else if (wallSection == 4) {
+                            push_right();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case 4:
+                        if (wallSection == 3 || wallSection == 4) {
+                            push_backward();
+                        } else if (wallSection == 2) {
+                            push_right();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case 5:
+                        if (wallSection == 1 || wallSection == 3) {
+                            push_left();
+                        } else if (wallSection == 4) {
+                            push_backward();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case 6:
+                        if (wallSection == 1 || wallSection == 2) {
+                            push_forward();
+                        } else if (wallSection == 3) {
+                            push_left();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case 7:
+                        if (wallSection == 1 || wallSection == 2) {
+                            push_forward();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case 8:
+                        if (wallSection == 2 || wallSection == 4) {
+                            push_right();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case 9:
+                        if (wallSection == 3 || wallSection == 4) {
+                            push_backward();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case 10:
+                        if (wallSection == 1 || wallSection == 3) {
+                            push_left();
+                        } else {
+                            pushback();
+                        }
+                        break;
+                    case 11:
+                        if (wallSection == 1 || wallSection == 2) {
+                            push_forward();
+                        } else if (wallSection == 3 ) {
+                            push_left();
+                        } else {
+                            push_right();
+                        }
+                        break;
+                    case 12:
+                        if (wallSection == 1) {
+                            push_forward();
+                        } else if (wallSection == 2 || wallSection == 4 ) {
+                            push_right();
+                        } else {
+                            push_backward();
+                        }
+                        break;
+                    case 13:
+                        if (wallSection == 1) {
+                            push_left();
+                        } else if (wallSection == 2) {
+                            push_right();
+                        } else {
+                            push_backward();
+                        }
+                        break;
+                    case 14:
+                        if (wallSection == 1 || wallSection == 3) {
+                            push_left();
+                        } else if (wallSection == 2) {
+                            push_forward();
+                        } else {
+                            push_backward();
+                        }
+                        break;
+                }
+            }
+
+            if (this.getPosY() <= GameConfig.SNACKMAN_GROUND_LEVEL) {
+                this.setPosY(GameConfig.SNACKMAN_GROUND_LEVEL);
                 this.isJumping = false;
                 this.velocityY = 0;
+                this.hasDoubleJumped = false;
+                System.out.println("\nhasDoubleJumped: " + hasDoubleJumped + "\n");
             }
+        }
+    }
+
+    private void subtractCaloriesSingleJump() {
+        setKcal(getKcal() - 100);
+    }
+
+    private void subtractCaloriesDoubleJump() {
+        if (!hasDoubleJumped) {
+            setKcal(getKcal() - 100);
         }
     }
 
@@ -168,3 +314,4 @@ public class SnackMan extends EatingMob {
         this.sprintHandler = sprintHandler;
     }
 }
+
