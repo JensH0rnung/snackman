@@ -5,6 +5,8 @@ import de.hsrm.mi.swt.snackman.services.MapService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.ResponseEntity;
+
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -25,6 +27,7 @@ public class SnackmanApplication {
 
     public static void main(String[] args) {
         checkAndCopyResources();
+        deleteUnnecessaryMaps();
         SpringApplication.run(SnackmanApplication.class, args);
     }
 
@@ -111,5 +114,23 @@ public class SnackmanApplication {
                 log.severe("Failed to copy file from " + source + " to " + dest.resolve(src.relativize(source)) + ": " + e.getMessage());
             }
         });
+    }
+
+    private static void deleteUnnecessaryMaps(){
+        Path directoryPath = Paths.get("./extensions/map/").toAbsolutePath();
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(directoryPath, "*.txt")) {
+            for (Path filePath : stream) {
+                String fileName = filePath.getFileName().toString();
+                if (fileName.startsWith("SnackManMap") || fileName.startsWith("LastMap")) {
+                    try {
+                        Files.delete(filePath);
+                    } catch (IOException e) {
+                        log.severe("Failed to delete file: " + filePath + " - " + e.getMessage());
+                    }
+                }
+            }
+        } catch (IOException e) {
+            log.severe("Error accessing directory: " + directoryPath + " - " + e.getMessage());
+        }
     }
 }
