@@ -53,13 +53,13 @@ public class PlayerStompController {
 
     private SnackMan updateSnackman(PlayerToBackendDTO player, SnackMan snackman, Lobby currentLobby) {
         if (player.jump()) {
+            snackman.updateJumpPosition(player.delta());
             if (player.doubleJump()) {
                 snackman.doubleJump();
             } else {
                 snackman.jump();
             }
         }
-        snackman.updateJumpPosition(player.delta());
         snackman.setSprinting(player.sprinting());
 
         checkWinningCondition(snackman, currentLobby);
