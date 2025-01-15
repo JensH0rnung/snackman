@@ -5,17 +5,22 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
-import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.springframework.stereotype.Service;
 
 @Service
 public class ReadMazeService {
 
-    private PythonInterpreter pythonInterpreter = null;
-    private Properties pythonProps = new Properties();
+    private final String PYTHON_FILE_PATH = "./extensions/maze"; 
+    private PythonInterpreter interpreter;
+
+    public ReadMazeService(){
+        System.setProperty("python.import.site", "false");
+        interpreter = new PythonInterpreter();
+        interpreter.exec("import sys");
+        interpreter.exec("sys.path.append('" + PYTHON_FILE_PATH + "')");
+    }
 
     /**
      * Reads maze data from a file and converts it into a char array with [x][z]-coordinates
@@ -51,25 +56,7 @@ public class ReadMazeService {
     }
 
     public void generateNewMaze() {
-        String mazeScriptPath = "./extensions/maze/Maze.py";
-        try (PythonInterpreter localPythonInterpreter = new PythonInterpreter()) {
-            localPythonInterpreter.exec(mazeScriptPath);
-            localPythonInterpreter.exec("main()");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        interpreter.exec("from Maze import *");
+        interpreter.exec("main()");
     }
-
-    // /**
-    //  * Generates a new Maze and saves it in a Maze.txt file
-    //  */
-    // public void generateNewMaze() {
-    //     pythonProps.setProperty("python.path", "src/main/java/de/hsrm/mi/swt/snackman");
-    //     PythonInterpreter.initialize(System.getProperties(), pythonProps, new String[0]);
-    //     this.pythonInterpreter = new PythonInterpreter();
-    //     pythonInterpreter.exec("from Maze import main");
-    //     PyObject func = pythonInterpreter.get("main");
-    //     func.__call__();
-    // }
-
 }

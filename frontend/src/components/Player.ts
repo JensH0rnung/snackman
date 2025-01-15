@@ -87,6 +87,8 @@ export class Player {
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 60)
     this.camera.position.set(posX, posY, posZ)
     this.controls = new PointerLockControls(this.camera, renderer.domElement)
+    this.controls.maxPolarAngle = Math.PI-0.1
+    this.controls.minPolarAngle = 0.1
     document.addEventListener('keydown', (event) => {
       this.onKeyDown(event)
     })
@@ -324,6 +326,9 @@ export class Player {
    * 3 = both / diagonal collision / corner
    */
   public checkWallCollision(x: number, z: number): number {
+    if (this.gameMap[this.calcMapIndexOfCoordinate(x)][this.calcMapIndexOfCoordinate(z)].type == MapObjectType.WALL) {
+      return 3;
+  }
     let squareLeftRight: ISquare;
     let squareTopBottom: ISquare;
     let squareDiagonal: ISquare;
