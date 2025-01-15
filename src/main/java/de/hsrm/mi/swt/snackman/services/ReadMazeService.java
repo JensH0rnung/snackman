@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
 import org.springframework.stereotype.Service;
 
@@ -52,7 +53,7 @@ public class ReadMazeService {
     public void generateNewMaze() {
         String mazeScriptPath = "./extensions/maze/Maze.py";
         try (PythonInterpreter localPythonInterpreter = new PythonInterpreter()) {
-            localPythonInterpreter.execfile(mazeScriptPath);
+            localPythonInterpreter.exec(mazeScriptPath);
             localPythonInterpreter.exec("main()");
         } catch (Exception e) {
             e.printStackTrace();

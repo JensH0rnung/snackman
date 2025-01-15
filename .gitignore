@@ -44,7 +44,8 @@ src/main/java/de/hsrm/mi/swt/snackman/Maze$py.class
 Maze.txt
 /src/main/java/de/hsrm/mi/swt/snackman/GhostMovementSkript$py.class
 /src/main/java/de/hsrm/mi/swt/snackman/SmartGhostMovementSkript$py.class
-
+.jython_cache/
+cachedir/
 extensions/
 *.dylib
 mini-maze.txt
