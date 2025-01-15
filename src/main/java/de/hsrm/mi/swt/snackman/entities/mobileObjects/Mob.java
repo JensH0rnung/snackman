@@ -12,13 +12,13 @@ import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
  * A mobile object with the ability to move its position
  */
 public abstract class Mob {
+    private static long idCounter = 0;
     protected long id;
     private Vector3d position;
     private double radius;
     private Quaterniond quat;
     private double speed;
     private Vector3d spawn;
-    private  static long idCounter = 0;
     private Vector3d forward;
     private GameMap gameMap;
 
@@ -26,8 +26,8 @@ public abstract class Mob {
      * Base constructor for Map with spawn-location at center of Map
      *
      * @param gameMap GameMap
-     * @param speed      speed of the mob
-     * @param radius     size of the mob
+     * @param speed   speed of the mob
+     * @param radius  size of the mob
      */
     public Mob(GameMap gameMap, double speed, double radius) {
         this.gameMap = gameMap;
@@ -52,13 +52,14 @@ public abstract class Mob {
      * Constructor for Mob with custom spawn point
      *
      * @param gameMap MapService of the map the mob is located on
-     * @param speed      speed of the mob
-     * @param radius     size of the mob
-     * @param posX       x-spawn-position
-     * @param posY       y-spawn-positon
-     * @param posZ       z-spawn-position
+     * @param speed   speed of the mob
+     * @param radius  size of the mob
+     * @param posX    x-spawn-position
+     * @param posY    y-spawn-positon
+     * @param posZ    z-spawn-position
      */
     public Mob(GameMap gameMap, double speed, double radius, double posX, double posY, double posZ) {
+        this.gameMap = gameMap;
         this.speed = speed;
         this.radius = radius;
 
@@ -104,21 +105,18 @@ public abstract class Mob {
         this.radius = radius;
     }
 
-    public void setSpawn(Vector3d spawn) {
-        this.spawn = spawn;
-    }
-
-    public double getSpeed(){
+    public double getSpeed() {
         return speed;
     }
 
-    public void setSpeed(double speed){
+    public void setSpeed(double speed) {
         this.speed = speed;
     }
 
-    public Quaterniond getRotationQuaternion(){
+    public Quaterniond getRotationQuaternion() {
         return this.quat;
     }
+
     /**
      * Calculates the square-indices to set the currentSquare
      *
@@ -129,7 +127,7 @@ public abstract class Mob {
         setPositionWithIndexXZ(calcMapIndexOfCoordinate(x), calcMapIndexOfCoordinate(z));
     }
 
-    public void setPositionWithIndexXZ(double x, double z){
+    public void setPositionWithIndexXZ(double x, double z) {
         this.position.x = x;
         this.position.z = z;
     }
@@ -293,11 +291,11 @@ public abstract class Mob {
                     : currentSquare.getIndexZ() * GameConfig.SQUARE_SIZE;
             double dist = Math.sqrt((diagX - x) * (diagX - x) + (diagZ - z) * (diagZ - z));
             if (dist <= this.radius)
-            if (getPosY() >= GameConfig.SQUARE_HEIGHT) {
-                collisionCase = 0;
-            } else {
-                collisionCase = 3;
-            }
+                if (getPosY() >= GameConfig.SQUARE_HEIGHT) {
+                    collisionCase = 0;
+                } else {
+                    collisionCase = 3;
+                }
         }
 
         return collisionCase;
@@ -325,10 +323,6 @@ public abstract class Mob {
         quat.w = qW;
     }
 
-    public void setPosition(Vector3d position) {
-        this.position = position;
-    }
-
     public int calcMapIndexOfCoordinate(double a) {
         return (int) (a / GameConfig.SQUARE_SIZE);
     }
@@ -337,8 +331,16 @@ public abstract class Mob {
         return spawn;
     }
 
+    public void setSpawn(Vector3d spawn) {
+        this.spawn = spawn;
+    }
+
     public Vector3d getPosition() {
         return position;
+    }
+
+    public void setPosition(Vector3d position) {
+        this.position = position;
     }
 
     public long getId() {
@@ -491,40 +493,43 @@ public abstract class Mob {
         // Keine der Bedingungen erfüllt
         return 0;
     }
-    
+
 
     public int getWallSection() {
         // Die Position des Mobs auf der Karte berechnen
-        int mobX = calcMapIndexOfCoordinate(position.x);
-        int mobZ = calcMapIndexOfCoordinate(position.z);
-        Square square = gameMap.getSquareAtIndexXZ(mobX, mobZ);
-        long idOfSquare = square.getId();
-        double tempX = position.x;
-        double tempZ = position.z;
-    
-        while (gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(tempX), calcMapIndexOfCoordinate(tempZ)).getId() == idOfSquare) {
-            tempX = tempX - 1;
+        if (gameMap != null) {
+            int mobX = calcMapIndexOfCoordinate(position.x);
+            int mobZ = calcMapIndexOfCoordinate(position.z);
+            Square square = gameMap.getSquareAtIndexXZ(mobX, mobZ);
+            long idOfSquare = square.getId();
+            double tempX = position.x;
+            double tempZ = position.z;
+
+            while (gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(tempX), calcMapIndexOfCoordinate(tempZ)).getId() == idOfSquare) {
+                tempX = tempX - 1;
+            }
+            while (gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(tempX), calcMapIndexOfCoordinate(tempZ)).getId() == idOfSquare) {
+                tempZ = tempZ - 1;
+            }
+            // Die Koordinaten des Wall-Elements
+            double wallCenterX = tempX + (GameConfig.SQUARE_SIZE / 2);
+            double wallCenterZ = tempZ + (GameConfig.SQUARE_SIZE / 2);
+            //Berechnung der vier Bereiche:
+            //Vergleiche die Position des Mobs mit dem Zentrum des Wall-Elements
+            boolean isAboveCenter = position.z < wallCenterZ;
+            boolean isLeftOfCenter = position.x < wallCenterX;
+            //Bestimmen des Bereichs basierend auf der Position des Mobs
+            if (isAboveCenter && isLeftOfCenter) {
+                return 1; // Bereich 1 (oben links)
+            } else if (isAboveCenter && !isLeftOfCenter) {
+                return 2; // Bereich 2 (oben rechts)
+            } else if (!isAboveCenter && isLeftOfCenter) {
+                return 3; // Bereich 3 (unten links)
+            } else if (!isAboveCenter && !isLeftOfCenter) {
+                return 4; // Bereich 4 (unten rechts)
+            }
         }
-        while (gameMap.getSquareAtIndexXZ(calcMapIndexOfCoordinate(tempX), calcMapIndexOfCoordinate(tempZ)).getId() == idOfSquare) {
-            tempZ = tempZ - 1;
-        }
-        // Die Koordinaten des Wall-Elements
-        double wallCenterX = tempX + (GameConfig.SQUARE_SIZE / 2);
-        double wallCenterZ = tempZ + (GameConfig.SQUARE_SIZE / 2);
-        //Berechnung der vier Bereiche:
-        //Vergleiche die Position des Mobs mit dem Zentrum des Wall-Elements
-        boolean isAboveCenter = position.z < wallCenterZ;
-        boolean isLeftOfCenter = position.x < wallCenterX;
-        //Bestimmen des Bereichs basierend auf der Position des Mobs
-        if (isAboveCenter && isLeftOfCenter) {
-            return 1; // Bereich 1 (oben links)
-        } else if (isAboveCenter && !isLeftOfCenter) {
-            return 2; // Bereich 2 (oben rechts)
-        } else if (!isAboveCenter && isLeftOfCenter) {
-            return 3; // Bereich 3 (unten links)
-        } else if (!isAboveCenter && !isLeftOfCenter) {
-            return 4; // Bereich 4 (unten rechts)
-        }
+
         return 0; //Keine gültige Bereichszuordnung
     }
 
