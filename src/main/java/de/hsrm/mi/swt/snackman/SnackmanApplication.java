@@ -115,13 +115,11 @@ public class SnackmanApplication {
         Path directoryPath = Paths.get("./extensions/map/").toAbsolutePath();
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(directoryPath, "*.txt")) {
             for (Path filePath : stream) {
-                String fileName = filePath.getFileName().toString();
-                if (fileName.startsWith("SnackManMap") || fileName.startsWith("LastMap")) {
-                    try {
-                        Files.delete(filePath);
-                    } catch (IOException e) {
-                        log.severe("Failed to delete file: " + filePath + " - " + e.getMessage());
-                    }
+                try {
+                    Files.delete(filePath);
+                    log.info("Deleted file: " + filePath);
+                } catch (IOException e) {
+                    log.severe("Failed to delete file: " + filePath + " - " + e.getMessage());
                 }
             }
         } catch (IOException e) {
