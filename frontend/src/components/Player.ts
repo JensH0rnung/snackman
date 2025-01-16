@@ -30,6 +30,7 @@ export class Player {
   private lastJumpTime: number;
   private doubleJump: boolean;
   private spacePressed: boolean;
+  private reactionTimeDoubleJump: number;
 
   private calories: number;
 
@@ -70,6 +71,7 @@ export class Player {
     this.lastJumpTime = 0;
     this.doubleJump = false;
     this.spacePressed = false;
+    this.reactionTimeDoubleJump = 1000;
 
     const {mapContent} = useGameMapStore();
     this.squareSize = mapContent.DEFAULT_SQUARE_SIDE_LENGTH;
@@ -199,7 +201,7 @@ export class Player {
             //Single Jump
             this.isJumping = true;
             this.lastJumpTime = currentTime;
-          } else if (!this.doubleJump && (currentTime - this.lastJumpTime <= 600)) {
+          } else if (!this.doubleJump && (currentTime - this.lastJumpTime <= this.reactionTimeDoubleJump)) {
             //Double Jump
             this.doubleJump = true;
             this.lastJumpTime = currentTime;

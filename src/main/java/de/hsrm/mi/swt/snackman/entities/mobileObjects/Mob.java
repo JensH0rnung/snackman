@@ -1,12 +1,17 @@
 package de.hsrm.mi.swt.snackman.entities.mobileObjects;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
+
 import org.joml.Quaterniond;
 import org.joml.Vector3d;
+
 import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.Square;
 import de.hsrm.mi.swt.snackman.entities.mapObject.MapObjectType;
+import de.hsrm.mi.swt.snackman.entities.map.enums.WallAlignmentStatus;
+import de.hsrm.mi.swt.snackman.entities.map.enums.WallSectionStatus;
 
 /**
  * A mobile object with the ability to move its position
@@ -426,6 +431,7 @@ public abstract class Mob {
         position.add(additionalDisplacement);
     }
 
+    /*
     public int checkWallAlignment() {
         int mobX = calcMapIndexOfCoordinate(position.x);
         int mobZ = calcMapIndexOfCoordinate(position.z);
@@ -493,9 +499,77 @@ public abstract class Mob {
         // Keine der Bedingungen erfüllt
         return 0;
     }
+    */
+    public WallAlignmentStatus checkWallAlignment() {
+        int mobX = calcMapIndexOfCoordinate(position.x);
+        int mobZ = calcMapIndexOfCoordinate(position.z);
+        //Check for wall elements attached to given square
+        boolean leftWall = gameMap.getSquareAtIndexXZ(mobX - 1, mobZ).getType() == MapObjectType.WALL;
+        boolean rightWall = gameMap.getSquareAtIndexXZ(mobX + 1, mobZ).getType() == MapObjectType.WALL;
+        boolean topWall = gameMap.getSquareAtIndexXZ(mobX, mobZ - 1).getType() == MapObjectType.WALL;
+        boolean bottomWall = gameMap.getSquareAtIndexXZ(mobX, mobZ + 1).getType() == MapObjectType.WALL;
+        // Case 1: LEFT & RIGHT
+        if (!topWall && !bottomWall && leftWall && rightWall) {
+            return WallAlignmentStatus.CASE1_LEFT_RIGHT;
+        }
+        // Case 2: TOP & BOTTOM
+        if (topWall && bottomWall && !leftWall && !rightWall) {
+            return WallAlignmentStatus.CASE2_TOP_BOTTOM;
+        }
+        // Case 3: BOTTOM & LEFT
+        if (!topWall && bottomWall && leftWall && !rightWall) {
+            return WallAlignmentStatus.CASE3_BOTTOM_LEFT;
+        }
+        // Case 4: TOP & LEFT
+        if (topWall && !bottomWall && leftWall && !rightWall) {
+            return WallAlignmentStatus.CASE4_TOP_LEFT;
+        }
+        // Case 5: TOP & RIGHT
+        if (topWall && !bottomWall && !leftWall && rightWall) {
+            return WallAlignmentStatus.CASE5_TOP_RIGHT;
+        }
+        // Case 6: BOTTOM & RIGHT
+        if (!topWall && bottomWall && !leftWall && rightWall) {
+            return WallAlignmentStatus.CASE6_BOTTOM_RIGHT;
+        }
+        // Case 7: BOTTOM & LEFT & RIGHT
+        if (!topWall && bottomWall && leftWall && rightWall) {
+            return WallAlignmentStatus.CASE7_BOTTOM_LEFT_RIGHT;
+        }
+        // Case 8: TOP & BOTTOM & LEFT
+        if (topWall && bottomWall && leftWall && !rightWall) {
+            return WallAlignmentStatus.CASE8_TOP_BOTTOM_LEFT;
+        }
+        // Case 9: TOP & LEFT & RIGHT
+        if (topWall && !bottomWall && leftWall && rightWall) {
+            return WallAlignmentStatus.CASE9_TOP_LEFT_RIGHT;
+        }
+        // Case 10: TOP & BOTTOM & RIGHT
+        if (topWall && bottomWall && !leftWall && rightWall) {
+            return WallAlignmentStatus.CASE10_TOP_BOTTOM_RIGHT;
+        }
+        // Case 11: BOTTOM
+        if (!topWall && bottomWall && !leftWall && !rightWall) {
+            return WallAlignmentStatus.CASE11_BOTTOM;
+        }
+        // Case 12: LEFT
+        if (!topWall && !bottomWall && leftWall && !rightWall) {
+            return WallAlignmentStatus.CASE12_LEFT;
+        }
+        // Case 13: TOP
+        if (topWall && !bottomWall && !leftWall && !rightWall) {
+            return WallAlignmentStatus.CASE13_TOP;
+        }
+        // Case 14: RIGHT
+        if (!topWall && !bottomWall && !leftWall && rightWall) {
+            return WallAlignmentStatus.CASE14_RIGHT;
+        }
+        // Case 0: NONE
+        return WallAlignmentStatus.CASE0_NONE;
+    }
 
 
-    public int getWallSection() {
+    public WallSectionStatus getWallSection() {
         // Die Position des Mobs auf der Karte berechnen
         if (gameMap != null) {
             int mobX = calcMapIndexOfCoordinate(position.x);
@@ -520,17 +594,17 @@ public abstract class Mob {
             boolean isLeftOfCenter = position.x < wallCenterX;
             //Bestimmen des Bereichs basierend auf der Position des Mobs
             if (isAboveCenter && isLeftOfCenter) {
-                return 1; // Bereich 1 (oben links)
+                return WallSectionStatus.CASE1_TOP_LEFT; // Bereich 1 (oben links)
             } else if (isAboveCenter && !isLeftOfCenter) {
-                return 2; // Bereich 2 (oben rechts)
+                return WallSectionStatus.CASE2_TOP_RIGHT; // Bereich 2 (oben rechts)
             } else if (!isAboveCenter && isLeftOfCenter) {
-                return 3; // Bereich 3 (unten links)
+                return WallSectionStatus.CASE3_BOTTOM_LEFT; // Bereich 3 (unten links)
             } else if (!isAboveCenter && !isLeftOfCenter) {
-                return 4; // Bereich 4 (unten rechts)
+                return WallSectionStatus.CASE4_BOTTOM_RIGHT; // Bereich 4 (unten rechts)
             }
         }
 
-        return 0; //Keine gültige Bereichszuordnung
+        return WallSectionStatus.CASE0_NONE; //Keine gültige Bereichszuordnung
     }
 
     @Override
