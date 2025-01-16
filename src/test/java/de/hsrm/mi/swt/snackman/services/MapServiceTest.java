@@ -38,10 +38,9 @@ import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Directi
 @SpringBootTest
 class MapServiceTest {
 
+    private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
     @Autowired
     private MapService mapService;
-
-    private static final Path workFolder = Paths.get("./extensions").toAbsolutePath();
     @Autowired
     private MessageLoop messageLoop;
 
@@ -97,7 +96,7 @@ class MapServiceTest {
         };
         GameMap gameMap = mapService.convertMazeDataGameMap("1", mockMazeData);
         Square currentSquare = gameMap.getGameMapSquares()[1][1]; // Assuming it's a floor square
-        Chicken chicken = new Chicken(currentSquare, gameMap);
+        Chicken chicken = new Chicken(currentSquare, gameMap, "ChickenMovementSkript");
 
         List<String> visibleSquares = chicken.getSquaresVisibleForChicken(gameMap, currentSquare, Direction.ONE_NORTH);
 
@@ -125,7 +124,7 @@ class MapServiceTest {
         };
         GameMap gameMap = mapService.convertMazeDataGameMap("1", mockMazeData);
         Square currentSquare = gameMap.getGameMapSquares()[1][1]; // Assuming it's a floor square
-        Chicken chicken = new Chicken(currentSquare, gameMap);
+        Chicken chicken = new Chicken(currentSquare, gameMap, "ChickenMovementSkript");
 
         Square square = new Square(MapObjectType.FLOOR, 0, 0);
         Snack egg = new Snack(SnackType.EGG);
@@ -138,7 +137,7 @@ class MapServiceTest {
 
 
     @Test
-    void testAddEggToSquare_EggAddedToSquare_CaseEggIsNull() {
+    void testAddEggToSquare_EggAddedToSquare_CaseEggIsEmpty() {
         char[][] mockMazeData = new char[][]{
                 {'W', 'W', 'W', 'L', 'W'},
                 {'W', 'L', 'L', 'L', 'L'},
@@ -148,16 +147,14 @@ class MapServiceTest {
         };
         GameMap gameMap = mapService.convertMazeDataGameMap("1", mockMazeData);
         Square currentSquare = gameMap.getGameMapSquares()[1][1]; // Assuming it's a floor square
-        Chicken chicken = new Chicken(currentSquare, gameMap);
+        Chicken chicken = new Chicken(currentSquare, gameMap, "ChickenMovementSkript");
 
         Square square = new Square(MapObjectType.FLOOR, 0, 0);
-        Snack egg = null;
+        Snack emptyEgg = new Snack(SnackType.EMPTY);
 
-        Assertions.assertThrows(NullPointerException.class, () -> {
-            chicken.addEggToSquare(square, egg);
-        });
+        chicken.addEggToSquare(square, emptyEgg);
 
-        Assertions.assertNull(square.getSnack());
+        Assertions.assertEquals(square.getSnack().getSnackType(), SnackType.EMPTY);
     }
 
     @Test
@@ -219,6 +216,15 @@ class MapServiceTest {
 
         Assertions.assertTrue(clientMobs.get("05").calcMapIndexOfCoordinate(clientMobs.get("05").getPosition().x) == testMap[2][1].getIndexX());
         Assertions.assertTrue(clientMobs.get("05").calcMapIndexOfCoordinate(clientMobs.get("05").getPosition().z) == testMap[2][1].getIndexZ());
+
+    }
+
+    @Test
+    void randomeChickenSkriptLoad(){
+
+        String skriptName = mapService.loadChickenScripts();
+
+        Assertions.assertTrue(skriptName.equals("ChickenMovementSkript")  || skriptName.equals("TalaChickenMovementSkript"), skriptName);
 
     }
 
