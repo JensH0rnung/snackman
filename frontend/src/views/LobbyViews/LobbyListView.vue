@@ -123,7 +123,6 @@ const joinLobby = async (lobby: ILobbyDTD) => {
     )
 
     if (joinedLobby) {
-      console.log('Successfully joined lobby', joinedLobby.name)
       router.push({name: 'LobbyView', params: {lobbyId: lobby.lobbyId}})
     }
   } catch (error: any) {
@@ -132,22 +131,12 @@ const joinLobby = async (lobby: ILobbyDTD) => {
   }
 }
 
-onMounted(async () => {
-  await lobbiesStore.fetchLobbyList()
-  console.log(lobbies)
+    onMounted(async () => {
+        await lobbiesStore.fetchLobbyList();
 
-  if (
-    !lobbiesStore.lobbydata.currentPlayer ||
-    lobbiesStore.lobbydata.currentPlayer.playerId === '' ||
-    lobbiesStore.lobbydata.currentPlayer.playerName === ''
-  ) {
-    lobbiesStore.createPlayer('Player Test')
-  }
+        lobbiesStore.startLobbyLiveUpdate();
+    })
 
-  console.log('Current Player:', lobbiesStore.lobbydata.currentPlayer)
-
-  lobbiesStore.startLobbyLiveUpdate()
-})
 </script>
 
 <style scoped>
@@ -164,22 +153,20 @@ onMounted(async () => {
 }
 
 #individual-outer-box-size {
-  width: 70%;
-  max-width: 1000px;
-  height: 65%;
+  width: 60%;
+  max-width: 80%;
+  height: 60%;
+  padding: 2%;
 }
 
 .inner-box {
   position: relative;
-  margin-top: 1vh;
-  margin-bottom: 1vh;
   left: 50%;
   transform: translateX(-50%);
-  width: 90%;
-  max-height: 80%;
+  height: 65%;
   border-radius: 0.3rem;
   color: var(--primary-text-color);
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .inner-box > ul {
@@ -233,5 +220,16 @@ onMounted(async () => {
 .info-text {
   font-size: 1.8rem;
   padding: 1.2rem;
+}
+
+#darken-background {
+    z-index: 1;
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 50%);
+
+    transition: background 0.3s ease;
 }
 </style>
