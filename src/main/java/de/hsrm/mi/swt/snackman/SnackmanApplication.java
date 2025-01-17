@@ -13,7 +13,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class SnackmanApplication {
     static Logger log = Logger.getLogger(SnackmanApplication.class.getName());
-    
+
     public static void main(String[] args) {
         System.setProperty("python.import.site", "false");
         checkAndCopyResources();
