@@ -133,7 +133,7 @@ export const GameObjectRenderer = () => {
     const groundGeometry = new THREE.PlaneGeometry(GROUNDSIZE, GROUNDSIZE)
     const groundMaterial = new THREE.MeshStandardMaterial({ 
                               map: groundTexture,
-                              color: 0xcccccc,  
+                              color: 0xffffff,  
                               emissive: 0x000000,
                               roughness: 0.7,
                               metalness: 0.1, 
