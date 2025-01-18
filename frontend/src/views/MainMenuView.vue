@@ -8,15 +8,10 @@
     >
     </PlayerNameForm>
 
-    <ChooseDifficultySingleplayer
-      v-if="showChooseSingleplayerDifficulty"
-      @hideChooseDifficultySingleplayer="hideChooseDifficultySingleplayer">
-    </ChooseDifficultySingleplayer>
-
     <div class="button-container">
-      <MainMenuButton v-if="!showChooseSingleplayerDifficulty" @click="startSingleplayer">Singleplayer</MainMenuButton>
-      <MainMenuButton v-if="!showChooseSingleplayerDifficulty" @click="showLobbies">Multiplayer</MainMenuButton>
-      <MainMenuButton v-if="!showChooseSingleplayerDifficulty" @click="showLeaderboard">Leaderboard</MainMenuButton>
+      <MainMenuButton @click="startSingleplayer">Singleplayer</MainMenuButton>
+      <MainMenuButton @click="showLobbies">Multiplayer</MainMenuButton>
+      <MainMenuButton @click="showLeaderboard">Leaderboard</MainMenuButton>
     </div>
   </MenuBackground>
 </template>
@@ -28,9 +23,9 @@ import MenuBackground from '@/components/MenuBackground.vue'
 import PlayerNameForm from '@/components/PlayerNameForm.vue';
 import {useRouter} from 'vue-router'
 import {onMounted, ref} from 'vue';
+import type {ILobbyDTD} from "@/stores/Lobby/ILobbyDTD";
 import {SoundManager} from "@/services/SoundManager";
 import {SoundType} from "@/services/SoundTypes";
-import ChooseDifficultySingleplayer from "@/views/ChooseDifficultySingleplayer.vue";
 
 const router = useRouter()
 const lobbiesStore = useLobbiesStore()
@@ -38,15 +33,10 @@ const lobbiesStore = useLobbiesStore()
 const playerNameSaved = lobbiesStore.lobbydata.currentPlayer.playerName;
 const darkenBackground = ref(false);
 const showPlayerNameForm = ref(false);
-const showChooseSingleplayerDifficulty = ref(false);
 
 const hidePlayerNameForm = () => {
   showPlayerNameForm.value = false;
   darkenBackground.value = false;
-}
-
-const hideChooseDifficultySingleplayer = () => {
-  showChooseSingleplayerDifficulty.value = false
 }
 
 const showLobbies = () => {
@@ -57,8 +47,25 @@ const showLeaderboard = () => {
   router.push({name: 'Leaderboard'})
 }
 
-const startSingleplayer = () => {
-  showChooseSingleplayerDifficulty.value = true
+const startSingleplayer = async () => {
+  await lobbiesStore.createPlayer("Single Player")
+  const player = lobbiesStore.lobbydata.currentPlayer
+  const lobby = await lobbiesStore.startSingleplayerGame(player) as ILobbyDTD
+
+  if (!player.playerId || !lobby) {
+    console.error('Player or Lobby not found')
+    return
+  }
+
+  if (player.playerId === lobby.adminClient.playerId) {
+    await router.push({
+      name: 'GameView',
+      query: {
+        role: lobbiesStore.lobbydata.currentPlayer.role,
+        lobbyId: lobbiesStore.lobbydata.currentPlayer.joinedLobbyId,
+      },
+    })
+  }
 }
 
 onMounted(() => {

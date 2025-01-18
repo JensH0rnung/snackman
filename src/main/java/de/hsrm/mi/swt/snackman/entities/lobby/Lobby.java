@@ -5,7 +5,6 @@ import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.map.GameMap;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.Mob;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhost;
-import de.hsrm.mi.swt.snackman.entities.mobileObjects.ScriptGhostDifficulty;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.Chicken.Chicken;
 import de.hsrm.mi.swt.snackman.entities.mobileObjects.eatingMobs.SnackMan;
 import de.hsrm.mi.swt.snackman.messaging.MessageLoop.MessageLoop;
@@ -36,9 +35,8 @@ public class Lobby {
     private final Logger log = LoggerFactory.getLogger(Lobby.class);
     private MessageLoop messageLoop;
     private boolean usedCustomMap;
-    private ScriptGhostDifficulty scriptGhostDifficulty;
 
-    public Lobby(String lobbyId, String name, PlayerClient adminClient, GameMap gameMap, MessageLoop messageLoop, ScriptGhostDifficulty scriptGhostDifficulty) {
+    public Lobby(String lobbyId, String name, PlayerClient adminClient, GameMap gameMap, MessageLoop messageLoop) {
         this.lobbyId = lobbyId;
         this.gameMap = gameMap;
         this.name = name;
@@ -49,7 +47,6 @@ public class Lobby {
         this.members.add(adminClient);
         this.clientMobMap = new TreeMap<>();
         this.messageLoop = messageLoop;
-        this.scriptGhostDifficulty = scriptGhostDifficulty;
         initTimer();
         this.usedCustomMap = false;
     }
@@ -246,9 +243,5 @@ public class Lobby {
 
     public long getGameStartTime(){
         return this.gameStartTime;
-    }
-
-    public ScriptGhostDifficulty getScriptGhostDifficulty() {
-        return scriptGhostDifficulty;
     }
 }

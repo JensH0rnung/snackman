@@ -4,8 +4,6 @@ package de.hsrm.mi.swt.snackman.controller.Lobby;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import de.hsrm.mi.swt.snackman.configuration.GameConfig;
 import de.hsrm.mi.swt.snackman.entities.lobby.ROLE;
 import de.hsrm.mi.swt.snackman.messaging.*;
 import de.hsrm.mi.swt.snackman.messaging.FrontendMessageService;
@@ -72,7 +70,7 @@ public class LobbyController {
             Optional<PlayerClient> client = lobbyManagerService.findClientByClientId(creatorUuid);
 
             try {
-                  Lobby newLobby = lobbyManagerService.createLobby(name, client.get(), lobbyManagerService.getMessageLoop(), GameConfig.SCRIPT_GHOST_DIFFICULTY_MULTIPLAYER);
+                  Lobby newLobby = lobbyManagerService.createLobby(name, client.get(), lobbyManagerService.getMessageLoop());
                   messagingTemplate.convertAndSend("/topic/lobbies", lobbyManagerService.getAllLobbies());
                   logger.info("Creating lobby with name: {} and creatorUuid: {}", name, creatorUuid);
 
@@ -86,15 +84,14 @@ public class LobbyController {
       @PostMapping("start/singleplayer")
       public ResponseEntity<Lobby> startSingleplayer(@RequestBody Map<String, String> requestBody) {
             String creatorUuid = requestBody.get("creatorUuid");
-            String difficulty = requestBody.get("difficulty");        // TODO add this
 
-            if (creatorUuid == null || creatorUuid.isEmpty() || difficulty == null || difficulty.isEmpty()) {
+            if (creatorUuid == null || creatorUuid.isEmpty()) {
                   return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
             }
 
             Optional<PlayerClient> client = lobbyManagerService.findClientByClientId(creatorUuid);
             try {
-                  Lobby newLobby = lobbyManagerService.createLobby(client.get().getPlayerId(), client.get(), lobbyManagerService.getMessageLoop(), difficulty);
+                  Lobby newLobby = lobbyManagerService.createLobby(client.get().getPlayerId(), client.get(), lobbyManagerService.getMessageLoop());
                   client.get().setRole(ROLE.SNACKMAN);
                   lobbyManagerService.startSingleplayer(newLobby.getLobbyId());
 
