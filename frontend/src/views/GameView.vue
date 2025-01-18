@@ -65,6 +65,8 @@ let player: Player
 let scene: THREE.Scene
 let prevTime = performance.now()
 
+let skyboxCube: THREE.Mesh | null = null;
+
 const sprintData = reactive({
   sprintTimeLeft: 100, // percentage (0-100)
   isSprinting: false,
@@ -85,6 +87,14 @@ function animate() {
   currentCalories.value = player.getCalories()
   fps = 1 / clock.getDelta()
   player.updatePlayer()
+
+  if (skyboxCube) {
+    console.log("Rotating cube"); 
+    skyboxCube.rotation.x += 0.00005;
+    skyboxCube.rotation.y += 0.00005;
+  } else {
+    console.log("SkyboxCube is null");
+  }
 
   if (counter >= fps / targetHz) {
     const time = performance.now()
@@ -119,11 +129,14 @@ onMounted(async () => {
   console.log(formattedTime)
 
   // for rendering the scene, create gameMap in 3d and change window size
-  const {initRenderer, createGameMap, getScene} = GameMapRenderer()
+  const {initRenderer, createGameMap, getScene, getSkyboxCube} = GameMapRenderer()
   const gameObjectRenderer = GameObjectRenderer();
   
   scene = getScene()
   renderer = initRenderer(canvasRef.value)
+
+  skyboxCube = getSkyboxCube()
+  
   //Add gameMap
   try {
     await gameMapStore.initGameMap()
