@@ -9,7 +9,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
  * objects are rendered by the GameMapRenderer.ts
  */
 export const GameObjectRenderer = () => {
-  const GROUNDSIZE = 1000
+  const GROUNDSIZE = 100
   const loader = new GLTFLoader()
   const ghostGLB = "/ghost.glb"
   const chickenGLB = "/chicken_5.glb"
@@ -200,7 +200,7 @@ export const GameObjectRenderer = () => {
     const groundTexture = new THREE.TextureLoader().load('./textures/green-grass-512x512.jpg')
     groundTexture.wrapS = THREE.RepeatWrapping;
     groundTexture.wrapT = THREE.RepeatWrapping;
-    groundTexture.repeat.set(1000, 1000);
+    groundTexture.repeat.set(100, 100);
     const groundGeometry = new THREE.PlaneGeometry(GROUNDSIZE, GROUNDSIZE)
     const groundMaterial = new THREE.MeshStandardMaterial({
                               map: groundTexture,

@@ -121,6 +121,13 @@ function animate() {
     console.log("SkyboxCube is null")
   }
 
+  if (skyboxCube) {
+    skyboxCube.rotation.x += rotation_skybox_x
+    skyboxCube.rotation.y += rotation_skybox_y
+  } else {
+    console.log("SkyboxCube is null")
+  }
+
   if (counter >= fps / targetHz) {
     const time = performance.now()
     const delta = (time - prevTime) / 1000
