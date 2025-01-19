@@ -65,7 +65,7 @@ let player: Player
 let scene: THREE.Scene
 let prevTime = performance.now()
 
-let skyboxCube: THREE.Mesh | null = null;
+let skyboxCube: THREE.Mesh | null = null
 
 const sprintData = reactive({
   sprintTimeLeft: 100, // percentage (0-100)
@@ -89,11 +89,10 @@ function animate() {
   player.updatePlayer()
 
   if (skyboxCube) {
-    console.log("Rotating cube"); 
-    skyboxCube.rotation.x += 0.00005;
-    skyboxCube.rotation.y += 0.00005;
+    skyboxCube.rotation.x += 0.00005
+    skyboxCube.rotation.y += 0.00005
   } else {
-    console.log("SkyboxCube is null");
+    console.log("SkyboxCube is null")
   }
 
   if (counter >= fps / targetHz) {

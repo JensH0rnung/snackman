@@ -5,12 +5,12 @@ import { GameObjectRenderer } from '@/renderer/GameObjectRenderer'
 import { SnackType } from '@/stores/Snack/ISnackDTD'
 
 // Import skybox assets
-import bkImage from '@/assets/skybox_bk.png';
-import dnImage from '@/assets/skybox_dn.png';
-import ftImage from '@/assets/skybox_ft.png';
-import lfImage from '@/assets/skybox_lf.png';
-import rtImage from '@/assets/skybox_rt.png';
-import upImage from '@/assets/skybox_up.png';
+import bkImage from '@/assets/skybox_bk.png'
+import dnImage from '@/assets/skybox_dn.png'
+import ftImage from '@/assets/skybox_ft.png'
+import lfImage from '@/assets/skybox_lf.png'
+import rtImage from '@/assets/skybox_rt.png'
+import upImage from '@/assets/skybox_up.png'
 
 /**
  * for rendering the game map
@@ -35,26 +35,26 @@ export const GameMapRenderer = () => {
   scene.add(hemiLight)
 
   //SKYBOX
-  const textureLoader = new THREE.TextureLoader();
-  let skyboxCube: THREE.Mesh | null = null;
+  const textureLoader = new THREE.TextureLoader()
+  let skyboxCube: THREE.Mesh | null = null
 
   const addSkybox = () => {
-    const geometry = new THREE.BoxGeometry(500, 500, 500);
+    const geometry = new THREE.BoxGeometry(500, 500, 500)
     const cubeMaterials = [
-      new THREE.MeshBasicMaterial({ map: textureLoader.load(ftImage), side: THREE.DoubleSide }), // Rückseite
-      new THREE.MeshBasicMaterial({ map: textureLoader.load(bkImage), side: THREE.DoubleSide }), // Boden
-      new THREE.MeshBasicMaterial({ map: textureLoader.load(upImage), side: THREE.DoubleSide }), // Vorderseite
-      new THREE.MeshBasicMaterial({ map: textureLoader.load(dnImage), side: THREE.DoubleSide }), // Links
-      new THREE.MeshBasicMaterial({ map: textureLoader.load(rtImage), side: THREE.DoubleSide }), // Rechts
-      new THREE.MeshBasicMaterial({ map: textureLoader.load(lfImage), side: THREE.DoubleSide }), // Oben
-    ];
+      new THREE.MeshBasicMaterial({ map: textureLoader.load(ftImage), side: THREE.BackSide }), // FRONT
+      new THREE.MeshBasicMaterial({ map: textureLoader.load(bkImage), side: THREE.BackSide }), // BACK
+      new THREE.MeshBasicMaterial({ map: textureLoader.load(upImage), side: THREE.BackSide }), // UP
+      new THREE.MeshBasicMaterial({ map: textureLoader.load(dnImage), side: THREE.BackSide }), // DOWN
+      new THREE.MeshBasicMaterial({ map: textureLoader.load(rtImage), side: THREE.BackSide }), // RIGHT
+      new THREE.MeshBasicMaterial({ map: textureLoader.load(lfImage), side: THREE.BackSide }), // LEFT
+    ]
 
-    skyboxCube = new THREE.Mesh(geometry, cubeMaterials);
-    skyboxCube.position.set(0,0,0);
-    scene.add(skyboxCube);
-  };
+    skyboxCube = new THREE.Mesh(geometry, cubeMaterials)
+    skyboxCube.position.set(0,0,0)
+    scene.add(skyboxCube)
+  }
 
-  const getSkyboxCube = () => skyboxCube;
+  const getSkyboxCube = () => skyboxCube
 
   /**
    * initialize renderer
@@ -71,7 +71,7 @@ export const GameMapRenderer = () => {
     renderer.setPixelRatio(window.devicePixelRatio)
     renderer.shadowMap.enabled = true // activates the shadow calculation
 
-    addSkybox();
+    addSkybox()
 
     return renderer
   }
