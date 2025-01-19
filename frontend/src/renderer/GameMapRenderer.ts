@@ -39,7 +39,7 @@ export const GameMapRenderer = () => {
   let skyboxCube: THREE.Mesh | null = null;
 
   const addSkybox = () => {
-    const geometry = new THREE.BoxGeometry(100, 100, 100);
+    const geometry = new THREE.BoxGeometry(500, 500, 500);
     const cubeMaterials = [
       new THREE.MeshBasicMaterial({ map: textureLoader.load(ftImage), side: THREE.DoubleSide }), // Rückseite
       new THREE.MeshBasicMaterial({ map: textureLoader.load(bkImage), side: THREE.DoubleSide }), // Boden
@@ -50,7 +50,7 @@ export const GameMapRenderer = () => {
     ];
 
     skyboxCube = new THREE.Mesh(geometry, cubeMaterials);
-    skyboxCube.position.set(15,5,15);
+    skyboxCube.position.set(0,0,0);
     scene.add(skyboxCube);
   };
 
