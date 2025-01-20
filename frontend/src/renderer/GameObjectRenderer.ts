@@ -17,10 +17,10 @@ export const GameObjectRenderer = () => {
   let chickenModel: THREE.Group | null = null
 
   const snackModels = {
-    [SnackType.STRAWBERRY]: "/strawberry.glb",
+    [SnackType.STRAWBERRY]: "/strawberry_low_poly.glb",
     [SnackType.ORANGE]: "/orange.glb",
-    [SnackType.CHERRY]: "/cherry.glb",
-    [SnackType.APPLE]: "/apple.glb",
+    [SnackType.CHERRY]: "/cherry_low_poly.glb",
+    [SnackType.APPLE]: "/apple_low_poly.glb",
     [SnackType.EGG]: "/yoshiegg.glb",
     [SnackType.EMPTY]: null,
   };
@@ -57,6 +57,14 @@ export const GameObjectRenderer = () => {
         const scale = (sideLength / 3) / maxDimension; // Standardised scaling based on `sideLength`.
         snackModel.scale.set(scale, scale, scale);
 
+        if(type == SnackType.CHERRY){
+          snackModel.scale.set(scale/2, scale/2, scale/2);
+        }
+
+        if(type == SnackType.STRAWBERRY){
+          snackModel.scale.set(scale/1.5, scale/1.5, scale/1.5);
+        }
+        
         const yOffset = box.min.y * scale; // Bottom edge of the model after scaling
         snackModel.position.y -= yOffset;
 
