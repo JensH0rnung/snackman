@@ -67,7 +67,7 @@ let scene: THREE.Scene
 let prevTime = performance.now()
 
 let skyboxCube: THREE.Mesh | null = null
-const rotation_skybox_x = 0.00005
+//const rotation_skybox_x = 0.00005
 const rotation_skybox_y = 0.00005
 
 const sprintData = reactive({
@@ -115,14 +115,7 @@ function animate() {
   })
 
   if (skyboxCube) {
-    skyboxCube.rotation.x += rotation_skybox_x
-    skyboxCube.rotation.y += rotation_skybox_y
-  } else {
-    console.log("SkyboxCube is null")
-  }
-
-  if (skyboxCube) {
-    skyboxCube.rotation.x += rotation_skybox_x
+    //skyboxCube.rotation.x += rotation_skybox_x
     skyboxCube.rotation.y += rotation_skybox_y
   } else {
     console.log("SkyboxCube is null")
