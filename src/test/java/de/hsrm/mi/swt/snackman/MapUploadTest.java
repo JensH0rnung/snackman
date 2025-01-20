@@ -58,14 +58,16 @@ public class MapUploadTest {
 
         ResponseEntity<String> response = gameMapController.uploadMap(file, "1");
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("The map file is only allowed to contain the following characters: S, G, C, o, #, and spaces.", response.getBody());
+        assertEquals("The map file is only allowed to contain the following characters: S, G, C, o, #, and spaces. Please do not use the Tab key instead of spaces when creating the .txt file.", 
+                    response.getBody());
     }
 
     @ParameterizedTest
     @CsvSource({
-        "'G G G G\nC o # #', 'noSnackman.txt', 'The map file must contain exactly one ''S''.'",
-        "'S S G G\nC o # #', 'multipleSnackman.txt', 'The map file must contain exactly one ''S''.'",
-        "'S G G C\nC o # #', 'notEnoughGhosts.txt', 'The map file must contain at least 4 ''G''s for 4 ghost player.'"
+        "'S G G G\nC o G #', 'nonSquareMap.txt', 'The map must be a square, meaning the number of characters in each row must equal the total number of rows.'",
+        "'G G \nCo #\nG G \nCo #', 'noSnackman.txt', 'The map file must contain exactly one ''S''.'",
+        "'S S \nCo #\nG G \nCo #', 'multipleSnackman.txt', 'The map file must contain exactly one ''S''.'",
+        "'S G \nCo #\nG C \nCo #', 'notEnoughGhosts.txt', 'The map file must contain at least 4 ''G''s for 4 ghost player.'"
     })
     void testUploadMap_InvalidCases(String mapContent, String fileName, String expectedMessage) {
         MockMultipartFile file = new MockMultipartFile(
