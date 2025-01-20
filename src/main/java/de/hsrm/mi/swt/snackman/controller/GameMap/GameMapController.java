@@ -92,12 +92,25 @@ public class GameMapController {
 
             // Check File-Content
             String fileContent = new String(file.getBytes(), StandardCharsets.UTF_8);
-            String validPattern = "^[SGCo#\\s]*$";
+            String validPattern = "^[SGCo# ]*$";
 
             if (!fileContent.matches(validPattern)) {
                 return ResponseEntity.badRequest().body(
-                        "The map file is only allowed to contain the following characters: S, G, C, o, #, and spaces."
+                        "The map file is only allowed to contain the following characters: S, G, C, o, #, and spaces. Please do not use the Tab key instead of spaces when creating the .txt file."
                 );
+            }
+
+            // Split the file content into lines
+            String[] lines = fileContent.split("\\R");
+            int totalLines = lines.length;
+
+            // Validate each line's character count matches the total number of lines
+            for (String line : lines) {
+                if (line.length() != totalLines) {
+                    return ResponseEntity.badRequest().body(
+                            "The map must be a square, meaning the number of characters in each row must equal the total number of rows."
+                    );
+                }
             }
 
             // Check the number of Position for Snackman and Ghost
