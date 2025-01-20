@@ -17,7 +17,7 @@ export const GameObjectRenderer = () => {
   let chickenModel: THREE.Group | null = null
 
   const snackModels = {
-    [SnackType.STRAWBERRY]: "/strawberry.glb",
+    [SnackType.STRAWBERRY]: "/strawberry_low_poly.glb",
     [SnackType.ORANGE]: "/orange_low_poly.glb",
     [SnackType.CHERRY]: "/cherry_low_poly.glb",
     [SnackType.APPLE]: "/apple_low_poly.glb",
