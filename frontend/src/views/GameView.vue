@@ -72,6 +72,9 @@ const sprintData = reactive({
   isCooldown: false,
 })
 
+// skybox
+let skyboxCube: THREE.Mesh | null = null;
+
 // camera setup
 let camera: THREE.PerspectiveCamera
 
@@ -87,6 +90,11 @@ function animate() {
   currentCalories.value = player.getCalories()
   fps = 1 / clock.getDelta()
   player.lerpPosition()
+
+  if (skyboxCube) { 
+    skyboxCube.rotation.y += 0.00005;
+  }
+  
   gameMapStore.mapContent.chickens.forEach((chicken) => {
     const chickenModel = scene.getObjectById(chicken.meshId)
     if (chickenModel) {
@@ -140,11 +148,14 @@ onMounted(async () => {
   startCountDown()
 
   // for rendering the scene, create gameMap in 3d and change window size
-  const {initRenderer, createGameMap, getScene} = GameMapRenderer()
+  const {initRenderer, createGameMap, getScene, getSkyboxCube} = GameMapRenderer()
   const gameObjectRenderer = GameObjectRenderer();
 
   scene = getScene()
   renderer = initRenderer(canvasRef.value)
+
+  skyboxCube = getSkyboxCube()
+
   //Add gameMap
   try {
     await gameMapStore.initGameMap()

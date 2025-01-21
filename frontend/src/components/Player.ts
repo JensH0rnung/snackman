@@ -47,7 +47,7 @@ export class Player {
     this.lastJumpTime = 0;
     this.doubleJump = false;
     this.spacePressed = false;
-    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100)
+    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000)
     this.camera.position.set(posX, posY, posZ)
     this.controls = new PointerLockControls(this.camera, renderer.domElement)
     this.controls.maxPolarAngle = (170 / 180) * Math.PI;
