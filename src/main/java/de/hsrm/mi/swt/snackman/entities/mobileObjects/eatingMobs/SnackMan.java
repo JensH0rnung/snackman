@@ -65,7 +65,6 @@ public class SnackMan extends EatingMob {
         }
     }
 
-    //JUMPING
     public void jump() {
         if (!isJumping && getKcal() >= SINGLE_JUMP_CALORIE_COSTS) {
             this.velocityY = GameConfig.JUMP_STRENGTH;
