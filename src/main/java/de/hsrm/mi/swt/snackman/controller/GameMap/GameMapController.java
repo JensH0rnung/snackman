@@ -92,7 +92,7 @@ public class GameMapController {
 
             // Check File-Content
             String fileContent = new String(file.getBytes(), StandardCharsets.UTF_8);
-            String validPattern = "^[SGCo#\n ]*$";
+            String validPattern = "^[SGCo#\\n\\s]*$";
 
             if (!fileContent.matches(validPattern)) {
                 return ResponseEntity.badRequest().body(
