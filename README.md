@@ -2,7 +2,7 @@
 
 **SnackMan** is a 3D multiplayer browser game — a Pac-Man-style maze where you play a chicken collecting snacks and eggs while ghosts chase you. Jump into a lobby, pick your role, and race for the top of the leaderboard.
 
-> Built as a university software-engineering team project (SWT-Projekt).
+> Built as a university software-engineering team project (winter semester 2024 @Hochschule RheinMain).
 
 ## Features
 - Real-time **multiplayer** via WebSocket/STOMP (lobbies, role selection)
