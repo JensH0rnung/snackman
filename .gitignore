@@ -49,3 +49,7 @@ extensions/
 *.dylib
 mini-maze.txt
 leaderboard.txt
+
+### Environment ###
+.env
+.env.*

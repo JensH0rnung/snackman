@@ -24,7 +24,6 @@ repositories {
 
 sonar {
 	properties {
-		property 'sonar.token', 'SONARQUBE_TOKEN_REDACTED'
 		property 'sonar.host.url', 'http://localhost:9000/sonar'
 	}
 }
