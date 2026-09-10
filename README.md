@@ -41,5 +41,5 @@ frontend/   Vue 3 + Three.js client
 
 ## Quality
 - Unit tests with JUnit/Mockito, coverage via JaCoCo
-- Static analysis via SonarQube (token supplied via CI/secrets, not committed)
+- Static analysis via SonarQube (token supplied via CI/secrets)
 
