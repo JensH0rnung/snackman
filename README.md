@@ -43,5 +43,3 @@ frontend/   Vue 3 + Three.js client
 - Unit tests with JUnit/Mockito, coverage via JaCoCo
 - Static analysis via SonarQube (token supplied via CI/secrets, not committed)
 
-## License
-<!-- Add a license if you publish one. Replace or clarify third-party character assets (e.g. Kirby/Yoshi/Sonic) before public use. -->
